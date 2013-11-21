@@ -5,6 +5,8 @@ This repository contains work on the qualifying assignment for the Compilers cou
 ## Folders ##
 
 * The G-Opgave folder is the working directory 
+	Tests go into the DATA folder
+
 * The Vanilla folder contains the code handed out, without any edits
 
 ## Language ##
