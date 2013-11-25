@@ -1,0 +1,2 @@
+%token <string*(int*int)> ID (* String, position, (perhaps line or char) *)
+%token <int*(int*int)> INT (* Number, position, (perhaps line or char) *)
