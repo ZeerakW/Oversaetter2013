@@ -1,2 +1,12 @@
-%token <string*(int*int)> ID (* String, position, (perhaps line or char) *)
-%token <int*(int*int)> INT (* Number, position, (perhaps line or char) *)
+%token <string*(int*int)> ID				(* Type, position(line, char position) *)
+%token <int*(int*int)> INT				(* Type, position (line,$ position) *)
+%token <char*(int*int)> CHAR
+%token <int*(int*int)> BOOL
+%token <(int*int)> IF THEN ELSE NOT AND OR EQUAL LESS	(* position *)
+%token <(int*int)> PLUS MINUS TIMES DIVIDE 		(*  *)
+%token <(int*int)> LPAR RPAR RCB LCB 			(* RCB = Right Curly Brace, ... *)
+%token <(int*int)> COMMA SEMICOLON COLON ASSIGN EOF 	(* ASSIGN = ':=')
+%token <(int*int)> PROGRAM FUNCTION PROCEDURE VAR BEGIN END RETURN
+%token <(int*int)> READ WRITE
+%token <(int*int)> TRUE FALSE
+%token <(int*int)> ARRAY
