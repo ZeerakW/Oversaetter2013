@@ -1,6 +1,7 @@
 \documentclass[10pt]{article}
 \usepackage[margin=3cm]{geometry}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{array}
 \usepackage{amsmath}
 \usepackage{xcolor}
@@ -29,6 +30,133 @@ Content goes here.
 
 \section{Analysis}
 \subsection{Parser}
+\subsubsection{Identifiyng tokens}
+In our abstract parser definition most of our tokens use the type $<int*int>$. This type is the position of the token, which is constructed by line and character. If nothing is stated in the tables, this is the type used.
+
+We have ifdentified the list of terminals and given everyone of them keywords, for use later in the abstract parser definition.
+
+All the keywords of the Paladim language is listed in table \ref{tab:keywords}, these only use the positional data, meaning they all have token type $<int*int>$, since we have chosen to denote the position by linenumber and character in the line.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c|c}
+Terminal & Keyword \\
+\hline
+\textbf{program} & PROGRAM \\
+\textbf{function} & FUNCTION \\
+\textbf{procedure} & PROCEDURE \\
+\textbf{var} & VAR \\
+\textbf{begin} & BEGIN \\
+\textbf{end} & END \\
+\textbf{if} & IF \\
+\textbf{then} & THEN \\
+\textbf{else} & ELSE \\
+\textbf{while} & WHILE \\
+\textbf{do} & DO \\
+\textbf{return} & RETURN \\
+\end{tabular}
+\caption{\label{tab:keywords}Keywords}
+\end{table}
+
+We also need keywords for the specific types, since we should be able to write the following as noted in (\ref{eq:varname_type}). The keyword is written in Table \ref{tab:type_keywords}.
+\begin{align}
+\label{eq:varname_type}
+\text{VariableName} \textbf{ : } \text{Type}.
+\end{align}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c|c}
+Terminal & Keyword \\
+\hline
+\textbf{int} & INT \\
+\textbf{char} & CHAR \\
+\textbf{bool} & BOOL \\
+\textbf{array of} & ARRAYOF \\
+\textbf{of} & OF \\
+\end{tabular}
+\caption{\label{tab:type_keywords}Type keywords}
+\end{table}
+
+Next terminals we need to consider is symbols. These are very simple and shown in table \ref{tab:symbols}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c|c}
+Terminal & Keyword \\
+\hline
+\textbf{;} & SEMICOLON \\
+\textbf{:} & COLON \\
+\textbf{,} & COMMA \\
+\textbf{:=} & ASSIGN \\
+\textbf{EOF} & EOF \\
+\end{tabular}
+\caption{\label{tab:symbols}Symbols}
+\end{table}
+
+All arithmetic operators is found in table \ref{tab:arithmetics}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c|c}
+Terminal & Keyword \\
+\hline
+\text{+} & PLUS \\
+\text{-} & MINUS \\
+\text{*} & TIMES \\
+\text{/} & DIVIDE \\
+\text{=} & EQUAL \\
+\text{<} & LESS \\
+\textbf{AND} & AND \\
+\textbf{OR} & OR \\
+\textbf{NOT} & NOT \\
+\end{tabular}
+\caption{\label{tab:arithmetics}Arithmetics}
+\end{table}
+
+Parantheses is covered in table \ref{tab:parentheses}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c|c}
+Terminal & Keyword \\
+\hline
+\text{(} & LPAR \\
+\text{)} & RPAR \\
+\text{\{} & LCBR \\
+\text{\}} & RCBR \\
+\text{[} & LBRA \\
+\text{]} & RBRA \\
+\end{tabular}
+\caption{\label{tab:parentheses}Parentheses}
+\end{table}
+
+Finally we have all of the literals, which are supposed to contain both data and a position. As seen in table \ref{tab:literals}, they all make use of some sort of variable to store their content. We also cover the Identifier here.
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{c|cc}
+Terminal & Keyword & Type\\
+\hline
+\textbf{ID} & ID & <string*(int*int)>\\
+\textbf{NUMLIT} & NUMLIT & <int*(int*int)>\\
+\textbf{LOGICLIT} & LOGLIT & <bool*(int*int)> \\
+\textbf{CHARLIT} & CHALIT & <char*(int*int)> \\
+\textbf{STRINGLIT} & STRLIT & <string*(int*int)> \\
+\end{tabular}
+\caption{\label{tab:literals}Literals}
+\end{table}
+
+\subsubsection{Precedence}
+Next tasks is to denote the precedence of the operators.
+Write here \ldots
+
+\subsubsection{Non-terminals}
+Write here \ldots
+
+\subsubsection{Productions}
+Write here \ldots
+
 \subsection{Integer multiplication/division}
 \subsection{Boolean operators}
 \subsection{Type inteference}
