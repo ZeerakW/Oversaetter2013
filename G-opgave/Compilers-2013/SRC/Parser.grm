@@ -1,12 +1,28 @@
-%token <string*(int*int)> ID				(* Type, position(line, char position) *)
-%token <int*(int*int)> INT				(* Type, position (line,$ position) *)
-%token <char*(int*int)> CHAR
-%token <int*(int*int)> BOOL
-%token <(int*int)> IF THEN ELSE NOT AND OR EQUAL LESS	(* position *)
-%token <(int*int)> PLUS MINUS TIMES DIVIDE 		(*  *)
-%token <(int*int)> LPAR RPAR RCB LCB 			(* RCB = Right Curly Brace, ... *)
-%token <(int*int)> COMMA SEMICOLON COLON ASSIGN EOF 	(* ASSIGN = ':=')
-%token <(int*int)> PROGRAM FUNCTION PROCEDURE VAR BEGIN END RETURN
-%token <(int*int)> READ WRITE
-%token <(int*int)> TRUE FALSE
-%token <(int*int)> ARRAY
+/** Tokens **/
+
+/* Literals */
+%token <string*(int*int)> ID				/* Type, position(line, char position) */
+%token <int*(int*int)> NUMLIT				/* Type, position (line,char position) */
+%token <bool*(int*int)> LOGLIT              /* Type, position (line,char position) */
+%token <char*(int*int)> CHALIT              /* Type, position (line,char position) */
+%token <string*(int*int)> STRLIT            /* Type, position (line,char position) */
+
+/* Keywords */
+%token <(int*int)> PROGRAM FUNCTION PROCEDURE VAR BEGIN END IF THEN ELSE
+%token <(int*int)> WHILE DO RETURN
+
+/* Type Keywords */
+%token <(int*int)> INT CHAR BOOL ARRAYOF OF
+
+/* Symbols */
+%token <(int*int)> SEMICOLON COLON COMMA ASSIGN EOF  /* ASSIGN = ':=' */
+
+/* Arithmetic */
+%token <(int*int)> PLUS MINUS TIMES DIVIDE EQUAL LESS AND OR NOT
+
+/* Parantheses */
+%token <(int*int)> LPAR RPAR RCBR LCBR LBRA RBRA    /* RCBR = Right Curly Brace, ... */
+
+/* VARIOUS */
+%token <(int*int)> TRUE FALSE READ WRITE
+
