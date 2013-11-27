@@ -28,10 +28,24 @@ Write here \ldots
 
 \section{Background}
 Write here \ldots
+%\pgfversion
+%%\begin{dot2tex}
+%digraph {
+%  rankdir = LR;
+%  node [shape=circle];
+%  start [color=white, shape=plaintext];
+%  q2 [shape=doublecircle];
+%  start -> q1;
+%  q1 -> q1 [label="a"];
+%  q2 -> q2 [label="a"];
+%  q1 -> q2 [label="b"];
+%  q2 -> q1 [label="b"];
+%}
+%\end{dot2tex}
 
 \section{Analysis}
 \subsection{Parser}
-\subsubsection{Identifiyng tokens}
+\subsubsection{Identifying tokens}
 In our abstract parser definition most of our tokens use the type $<int*int>$. This type is the position of the token, which is constructed by line and character. If nothing is stated in the tables, this is the type used.
 
 We have ifdentified the list of terminals and given everyone of them keywords, for use later in the abstract parser definition.

@@ -23,6 +23,142 @@
 /* Parantheses */
 %token <(int*int)> LPAR RPAR RCBR LCBR LBRA RBRA    /* RCBR = Right Curly Brace, ... */
 
-/* VARIOUS */
-%token <(int*int)> TRUE FALSE READ WRITE
+/* VARIOUS - Dont know if they are neccessary! */
+%token <(int*int)> TRUE FALSE
 
+%start Prog
+
+/* Lowest precedence in top */
+%right OR
+%right AND
+%nonassoc NOT
+%nonassoc EQUAL LESS
+%left PLUS MINUS
+%left TIMES DIVIDE
+//%left       /* Left associative */ 
+//%nonassoc   /* Non associative*/
+/** Highest precedence in bottom */
+
+/** Types **/
+%type <Paladim.Prog> Prog
+%type <Paladim.FunDecs> FunDecs
+%type <Paladim.FunDec> FunDec
+%type <Paladim.Block> Block
+%type <Paladim.DBlock> DBlock
+%type <Paladim.SBlock> SBlock
+%type <Paladim.StmtSeq> StmtSeq
+%type <Paladim.Stmt> Stmt
+%type <Paladim.LVal> LVal
+%type <Paladim.Ret> Ret
+%type <Paladim.Exp> Exp
+%type <Paladim.OP> OP
+%type <Paladim.PDecl> PDecl
+%type <Paladim.Params> Params
+%type <Paladim.Dec> Dec
+%type <Paladim.Decs> Decs
+%type <Paladim.Type> Type
+%type <Paladim.CallParams> CallParams
+%type <Paladim.Exps> Exps
+
+%%
+
+/* Rules  */
+/* Program structure */
+Prog : PROGRAM ID SEMICOLON FunDecs EOF     { $1 }
+;
+
+FunDecs : FunDecs FunDec                    {}
+        | FunDec                            {}
+;
+
+FunDec : FUNCTION ID LPAR PDecl RPAR COLON Type Block SEMICOLON {}
+       | PROCEDURE ID  LPAR PDecl RPAR Block SEMICOLON  {}
+;
+
+Block : DBlock SBlock                       {}
+;
+
+DBlock : VAR Decs                           {}
+       |                                    {}
+;
+
+SBlock : BEGIN StmtSeq SEMICOLON END        {}
+       | Stmt                               {}
+;
+
+StmtSeq : StmtSeq SEMICOLON Stmt            {}
+        | Stmt                              {}
+;
+
+/* Statements */
+Stmt : ID LPAR CallParams RPAR              {}
+    | IF Exp THEN Block                     {}
+    | IF Exp THEN Block ELSE Block          {}
+    | WHILE Exp DO Block                    {}
+    | RETURN Ret                            {}
+    | LVal ASSIGN Exp                       {}
+;
+
+/* L-Values and Expressions */
+LVal : ID                                   {}
+     | ID LBRA Exps RBRA                    {}
+;
+
+Ret : Exp                                   {}
+    |                                       {}
+;
+
+Exp : NUMLIT                                {}
+    | LOGLIT                                {}
+    | CHALIT                                {}
+    | STRLIT                                {}
+    | LCBR Exps RCBR                        {}
+    | LVal                                  {}
+    | NOT Exp                               {}
+    | Exp OP Exp                            {}
+    | LPAR Exp RPAR                         {}
+    | ID LPAR CallParams RPAR               {}
+;
+
+OP : PLUS                                   {}
+    | MINUS                                 {}
+    | TIMES                                 {}
+    | DIVIDE                                {}
+    | EQUAL                                 {}
+    | LESS                                  {}
+    | AND                                   {}
+    | OR                                    {}
+;
+
+/* Variable and Parameter, Declarations, Types */
+PDecl : Params                              {}
+      |                                     {}
+;
+
+Params : Params SEMICOLON Dec               {}
+       | Dec                                {}
+;
+
+Dec : ID COLON Type                         {}
+;
+
+Decs : Decs Dec SEMICOLON                   {}
+     | Dec SEMICOLON                        {}
+;
+
+Type : INT                                  {}
+     | CHAR                                 {}
+     | BOOL                                 {}
+     | ARRAYOF                              {}
+;
+
+/* Function and Procedure Parameters and Index Lists */
+CallParams : Exps                           {}
+           |                                {}
+;
+
+Exps : Exp COMMA Exps                       {}
+     | Exp                                  {}
+;
+
+/* Trailer*/
