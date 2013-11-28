@@ -67,13 +67,13 @@
 Prog : PROGRAM ID SEMICOLON FunDecs EOF     { $4 }
 ;
 
-FunDecs : FunDecs FunDec                    { $1 :: $2 }
-        | FunDec                            { $1 }
+FunDecs : FunDecs FunDec                    { $1 @ [$2] }
+        | FunDec                            { [$1] }
 ;
 
-FunDec : FUNCTION ID LPAR PDecl RPAR COLON Type Block SEMICOLON { ($7, #1 $2, $4, $8, $1) }
+FunDec : FUNCTION ID LPAR PDecl RPAR COLON Type Block SEMICOLON { Absyn.Func ($7, #1 $2, $4, $8, $1) }
                                                                 /* Type, Identifier, PDecl, Block, func pos */
-       | PROCEDURE ID  LPAR PDecl RPAR Block SEMICOLON          { (#1 $2, $4, $6, $1) }
+       | PROCEDURE ID  LPAR PDecl RPAR Block SEMICOLON          { Absyn.Proc (#1 $2, $4, $6, $1) }
                                                                 /* Identifier, PDecl, Block, proc pos */
 ;
 
