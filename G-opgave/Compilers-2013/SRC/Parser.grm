@@ -40,25 +40,25 @@
 /** Highest precedence in bottom */
 
 /** Types **/
-%type <Absyn.Prog> Prog
-%type <Absyn.FunDec list> FunDecs
-%type <Absyn.FunDec> FunDec
-%type <Absyn.StmtBlock> Block
-%type <Absyn.Dec list> DBlock
-%type <Absyn.Stmt list> SBlock
-%type <Absyn.Stmt list> StmtSeq
-%type <Absyn.Stmt> Stmt
-%type <Absyn.LVAL> LVal
-%type <Absyn.Exp option> Ret
-%type <Absyn.Exp> Exp
-%type <Absyn.Exp> OP
-%type <Absyn.Dec list> PDecl
-%type <Absyn.Dec list> Params
-%type <Absyn.Dec> Dec
-%type <Absyn.Dec list> Decs
-%type <Absyn.Type> Type
-%type <Absyn.Exp list> CallParams
-%type <Absyn.Exp list> Exps
+%type <AbSyn.FunDec list> Prog
+%type <AbSyn.FunDec list> FunDecs
+%type <AbSyn.FunDec> FunDec
+%type <AbSyn.StmtBlock> Block
+%type <AbSyn.Dec list> DBlock
+%type <AbSyn.Stmt list> SBlock
+%type <AbSyn.Stmt list> StmtSeq
+%type <AbSyn.Stmt> Stmt
+%type <AbSyn.LVAL> LVal
+%type <AbSyn.Exp option> Ret
+%type <AbSyn.Exp> Exp
+%type <AbSyn.Exp> OP
+%type <AbSyn.Dec list> PDecl
+%type <AbSyn.Dec list> Params
+%type <AbSyn.Dec> Dec
+%type <AbSyn.Dec list> Decs
+%type <AbSyn.Type> Type
+%type <AbSyn.Exp list> CallParams
+%type <AbSyn.Exp list> Exps
 
 %%
 
@@ -71,13 +71,13 @@ FunDecs : FunDecs FunDec                    { $1 @ [$2] }
         | FunDec                            { [$1] }
 ;
 
-FunDec : FUNCTION ID LPAR PDecl RPAR COLON Type Block SEMICOLON { Absyn.Func ($7, #1 $2, $4, $8, $1) }
+FunDec : FUNCTION ID LPAR PDecl RPAR COLON Type Block SEMICOLON { AbSyn.Func ($7, #1 $2, $4, $8, $1) }
                                                                 /* Type, Identifier, PDecl, Block, func pos */
-       | PROCEDURE ID  LPAR PDecl RPAR Block SEMICOLON          { Absyn.Proc (#1 $2, $4, $6, $1) }
+       | PROCEDURE ID  LPAR PDecl RPAR Block SEMICOLON          { AbSyn.Proc (#1 $2, $4, $6, $1) }
                                                                 /* Identifier, PDecl, Block, proc pos */
 ;
 
-Block : DBlock SBlock                       { Absyn.Block ($1, $2) }
+Block : DBlock SBlock                       { AbSyn.Block ($1, $2) }
 ;
 
 DBlock : VAR Decs                           { $2 }
@@ -93,27 +93,27 @@ StmtSeq : StmtSeq SEMICOLON Stmt            { $1 @ [$3] }
 ;
 
 /* Statements */
-Stmt : ID LPAR CallParams RPAR              { Absyn.ProcCall (#1 $1, $3, #2 $1) }
+Stmt : ID LPAR CallParams RPAR              { AbSyn.ProcCall (#1 $1, $3, #2 $1) }
        /* OBS! 3rd arguments is wrong, since this case doesnt have ELSE*/
-     | IF Exp THEN Block                    { Absyn.IfThEl($2, $4, $4, $1) }
-     | IF Exp THEN Block ELSE Block         { Absyn.IfThEl($2, $4, $6, $1) }
-     | WHILE Exp DO Block                   { Absyn.While($2, $4, $1) }
-     | RETURN Ret                           { Absyn.Return($2, $1) }
-     | LVal ASSIGN Exp                      { Absyn.Assign($1, $3, (0,0))}
+     | IF Exp THEN Block                    { AbSyn.IfThEl($2, $4, $4, $1) }
+     | IF Exp THEN Block ELSE Block         { AbSyn.IfThEl($2, $4, $6, $1) }
+     | WHILE Exp DO Block                   { AbSyn.While($2, $4, $1) }
+     | RETURN Ret                           { AbSyn.Return($2, $1) }
+     | LVal ASSIGN Exp                      { AbSyn.Assign($1, $3, (0,0))}
 ;
 
 /* L-Values and Expressions */
-LVal : ID                                   {Absyn.Var (#1 $1)}
-     | ID LBRA Exps RBRA                    {Absyn.Index (#1 $1, $3)}
+LVal : ID                                   {AbSyn.Var (#1 $1)}
+     | ID LBRA Exps RBRA                    {AbSyn.Index (#1 $1, $3)}
 ;
 
-Ret : Exp                                   { $1 }
-    |                                       { }
+Ret : Exp                                   { SOME $1 }
+    |                                       { NONE }
 ;
 
-Exp : NUMLIT                                { AbSyn.Literal.Value.BVal.Num $1 }
-    | LOGLIT                                { AbSyn.Literal.Value.BVal.Log $1 }
-    | CHALIT                                { AbSyn.Literal.Value.BVal.Chr $1 }
+Exp : NUMLIT                                { AbSyn.Literal (AbSyn.BVal (AbSyn.Num (#1 $1)) , #2 $1) }
+    | LOGLIT                                { AbSyn.Literal (AbSyn.BVal (AbSyn.Log (#1 $1)) , #2 $1) }
+    | CHALIT                                { AbSyn.Literal (AbSyn.BVal (AbSyn.Chr (#1 $1)) , #2 $1) }
     | STRLIT                                { AbSyn.StrLit $1 }
     | LCBR Exps RCBR                        { AbSyn.ArrLit $2 }
     | LVal                                  { AbSyn.LValue $1 }
