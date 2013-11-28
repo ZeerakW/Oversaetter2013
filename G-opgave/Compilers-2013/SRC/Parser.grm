@@ -67,7 +67,7 @@
 Prog : PROGRAM ID SEMICOLON FunDecs EOF     { $4 }
 ;
 
-FunDecs : FunDecs FunDec                    { $1 :: 2 }
+FunDecs : FunDecs FunDec                    { $1 :: $2 }
         | FunDec                            { $1 }
 ;
 
