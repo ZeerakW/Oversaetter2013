@@ -40,39 +40,41 @@
 /** Highest precedence in bottom */
 
 /** Types **/
-%type <Paladim.Prog> Prog
-%type <Paladim.FunDecs> FunDecs
-%type <Paladim.FunDec> FunDec
-%type <Paladim.Block> Block
-%type <Paladim.DBlock> DBlock
-%type <Paladim.SBlock> SBlock
-%type <Paladim.StmtSeq> StmtSeq
-%type <Paladim.Stmt> Stmt
-%type <Paladim.LVal> LVal
-%type <Paladim.Ret> Ret
-%type <Paladim.Exp> Exp
-%type <Paladim.OP> OP
-%type <Paladim.PDecl> PDecl
-%type <Paladim.Params> Params
-%type <Paladim.Dec> Dec
-%type <Paladim.Decs> Decs
-%type <Paladim.Type> Type
-%type <Paladim.CallParams> CallParams
-%type <Paladim.Exps> Exps
+%type <Absyn.Prog> Prog
+%type <Absyn.FunDec list> FunDecs
+%type <Absyn.FunDec> FunDec
+%type <Absyn.Block> Block
+%type <Absyn.DBlock> DBlock
+%type <Absyn.SBlock> SBlock
+%type <Absyn.StmtSeq> StmtSeq
+%type <Absyn.Stmt> Stmt
+%type <Absyn.LVal> LVal
+%type <Absyn.Ret> Ret
+%type <Absyn.Exp> Exp
+%type <Absyn.OP> OP
+%type <Absyn.PDecl> PDecl
+%type <Absyn.Params> Params
+%type <Absyn.Dec> Dec
+%type <Absyn.Decs> Decs
+%type <Absyn.Type> Type
+%type <Absyn.CallParams> CallParams
+%type <Absyn.Exps> Exps
 
 %%
 
 /* Rules  */
 /* Program structure */
-Prog : PROGRAM ID SEMICOLON FunDecs EOF     { $1 }
+Prog : PROGRAM ID SEMICOLON FunDecs EOF     { $4 }
 ;
 
-FunDecs : FunDecs FunDec                    {}
-        | FunDec                            {}
+FunDecs : FunDecs FunDec                    { $1 :: 2 }
+        | FunDec                            { $1 }
 ;
 
-FunDec : FUNCTION ID LPAR PDecl RPAR COLON Type Block SEMICOLON {}
-       | PROCEDURE ID  LPAR PDecl RPAR Block SEMICOLON  {}
+FunDec : FUNCTION ID LPAR PDecl RPAR COLON Type Block SEMICOLON { ($7, #1 $2, $4, $8, $1) }
+                                                                /* Type, Identifier, PDecl, Block, func pos */
+       | PROCEDURE ID  LPAR PDecl RPAR Block SEMICOLON          { (#1 $2, $4, $6, $1) }
+                                                                /* Identifier, PDecl, Block, proc pos */
 ;
 
 Block : DBlock SBlock                       {}
