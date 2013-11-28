@@ -43,22 +43,22 @@
 %type <Absyn.Prog> Prog
 %type <Absyn.FunDec list> FunDecs
 %type <Absyn.FunDec> FunDec
-%type <Absyn.Block> Block
-%type <Absyn.DBlock> DBlock
-%type <Absyn.SBlock> SBlock
-%type <Absyn.StmtSeq> StmtSeq
+%type <Absyn.StmtBlock> Block
+%type <Absyn.Dec list> DBlock
+%type <Absyn.Stmt list> SBlock
+%type <Absyn.Stmt list> StmtSeq
 %type <Absyn.Stmt> Stmt
-%type <Absyn.LVal> LVal
-%type <Absyn.Ret> Ret
+%type <Absyn.LVAL> LVal
+%type <Absyn.Exp> Ret
 %type <Absyn.Exp> Exp
-%type <Absyn.OP> OP
-%type <Absyn.PDecl> PDecl
-%type <Absyn.Params> Params
+%type <Absyn.Exp> OP
+%type <Absyn.Dec list> PDecl
+%type <Absyn.Dec list> Params
 %type <Absyn.Dec> Dec
-%type <Absyn.Decs> Decs
+%type <Absyn.Dec list> Decs
 %type <Absyn.Type> Type
-%type <Absyn.CallParams> CallParams
-%type <Absyn.Exps> Exps
+%type <Absyn.Exp list> CallParams
+%type <Absyn.Exp list> Exps
 
 %%
 
@@ -77,18 +77,18 @@ FunDec : FUNCTION ID LPAR PDecl RPAR COLON Type Block SEMICOLON { ($7, #1 $2, $4
                                                                 /* Identifier, PDecl, Block, proc pos */
 ;
 
-Block : DBlock SBlock                       {}
+Block : DBlock SBlock                       { $1, $2 }
 ;
 
-DBlock : VAR Decs                           {}
-       |                                    {}
+DBlock : VAR Decs                           { $2 }
+       |                                    { [] }
 ;
 
-SBlock : BEGIN StmtSeq SEMICOLON END        {}
-       | Stmt                               {}
+SBlock : BEGIN StmtSeq SEMICOLON END        { $2 }
+       | Stmt                               { [$1] }
 ;
 
-StmtSeq : StmtSeq SEMICOLON Stmt            {}
+StmtSeq : StmtSeq SEMICOLON Stmt            {  }
         | Stmt                              {}
 ;
 
