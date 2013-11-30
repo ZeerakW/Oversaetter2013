@@ -1,0 +1,7 @@
+program writeTest;
+
+procedure main()
+begin
+   write(1);
+   write('\n');   
+end; // main
