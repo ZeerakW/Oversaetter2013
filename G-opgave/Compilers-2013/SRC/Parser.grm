@@ -114,50 +114,50 @@ Exp : NUMLIT                                { AbSyn.Literal (AbSyn.BVal (AbSyn.N
     | LOGLIT                                { AbSyn.Literal (AbSyn.BVal (AbSyn.Log (#1 $1)) , #2 $1) }
     | CHALIT                                { AbSyn.Literal (AbSyn.BVal (AbSyn.Chr (#1 $1)) , #2 $1) }
     | STRLIT                                { AbSyn.StrLit $1 }
-    | LCBR Exps RCBR                        { AbSyn.ArrLit $2 }
-    | LVal                                  { AbSyn.LValue $1 }
-    | NOT Exp                               { AbSyn.Not $2 }
+    | LCBR Exps RCBR                        { AbSyn.ArrLit ($2, $1) }
+//    | LVal                                  { AbSyn.LValue (1,$1) }
+    | NOT Exp                               { AbSyn.Not ($2, $1) }
     | LPAR Exp RPAR                         { $2}
-    | ID LPAR CallParams RPAR               { AbSyn.FunApp (#1 $1, $3) }
-    | Exp PLUS Exp                          { AbSyn.Plus ($1, $3) }
-    | Exp MINUS Exp                         { AbSyn.Minus ($1, $3) }
-    | Exp TIMES Exp                         { AbSyn.Times($1, $3) }
-    | Exp DIVIDE Exp                        { AbSyn.Div($1, $3) }
-    | Exp EQUAL Exp                         { AbSyn.Equal($1, $3) }
-    | Exp LESS Exp                          { AbSyn.Less($1, $3) }
-    | Exp AND Exp                           { AbSyn.And($1, $3) }
-    | Exp OR Exp                            { AbSyn.Or($1, $3) }
+    | ID LPAR CallParams RPAR               { AbSyn.FunApp (#1 $1, $3, #2 $1) }
+    | Exp PLUS Exp                          { AbSyn.Plus ($1, $3, $2) }
+    | Exp MINUS Exp                         { AbSyn.Minus ($1, $3, $2) }
+    | Exp TIMES Exp                         { AbSyn.Times($1, $3, $2) }
+    | Exp DIVIDE Exp                        { AbSyn.Div($1, $3, $2) }
+    | Exp EQUAL Exp                         { AbSyn.Equal($1, $3, $2) }
+    | Exp LESS Exp                          { AbSyn.Less($1, $3, $2) }
+    | Exp AND Exp                           { AbSyn.And($1, $3, $2) }
+    | Exp OR Exp                            { AbSyn.Or($1, $3, $2) }
 ;
 
 /* Variable and Parameter, Declarations, Types */
-PDecl : Params                              {}
-      |                                     {}
+PDecl : Params                              { $1 }
+      |                                     { [] }
 ;
 
-Params : Params SEMICOLON Dec               {}
-       | Dec                                {}
+Params : Params SEMICOLON Dec               { $1 @ [$3] }
+       | Dec                                { [$1] }
 ;
 
-Dec : ID COLON Type                         {}
+Dec : ID COLON Type                         { AbSyn.Dec(#1 $1, $3, #2 $1) }
 ;
 
-Decs : Decs Dec SEMICOLON                   {}
-     | Dec SEMICOLON                        {}
+Decs : Decs Dec SEMICOLON                   { $1 @ [$2] }
+     | Dec SEMICOLON                        { [$1] }
 ;
 
-Type : INT                                  {}
-     | CHAR                                 {}
-     | BOOL                                 {}
-     | ARRAYOF                              {}
+Type : INT                                  {AbSyn.Int $1}
+     | CHAR                                 {AbSyn.Char $1}
+     | BOOL                                 {AbSyn.Bool $1}
+//     | ARRAYOF                              {AbSyn.Array ($1,$1) }
 ;
 
 /* Function and Procedure Parameters and Index Lists */
-CallParams : Exps                           {}
-           |                                {}
+CallParams : Exps                           { $1 }
+           |                                { [] }
 ;
 
-Exps : Exp COMMA Exps                       {}
-     | Exp                                  {}
+Exps : Exp COMMA Exps                       { $1 :: $3 }
+     | Exp                                  { [$1] }
 ;
 
 /* Trailer*/
