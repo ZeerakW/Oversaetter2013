@@ -2,6 +2,12 @@ program writeTest;
 
 procedure main()
 begin
-   write(1);
-   write('\n');   
+   write(false and false);
+   write(true and false);
+   write(false and true);
+   write(true and true);
+   write(false or false);
+   write(true or false);
+   write(false or true);
+   write(true or true);
 end; // main
