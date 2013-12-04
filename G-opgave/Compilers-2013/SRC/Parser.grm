@@ -35,6 +35,7 @@
 %nonassoc EQUAL LESS
 %left PLUS MINUS
 %left TIMES DIVIDE
+%nonassoc OptElse
 //%left       /* Left associative */ 
 //%nonassoc   /* Non associative*/
 /** Highest precedence in bottom */
@@ -48,7 +49,6 @@
 %type <AbSyn.Stmt list> SBlock
 %type <AbSyn.Stmt list> StmtSeq
 %type <AbSyn.Stmt> Stmt
-%type <AbSyn.LVAL> LVal
 %type <AbSyn.Exp option> Ret
 %type <AbSyn.Exp> Exp
 %type <AbSyn.Dec list> PDecl
@@ -93,18 +93,19 @@ StmtSeq : StmtSeq SEMICOLON Stmt            { $1 @ [$3] }
 
 /* Statements */
 Stmt : ID LPAR CallParams RPAR              { AbSyn.ProcCall (#1 $1, $3, #2 $1) }
-       /* OBS! 3rd arguments is wrong, since this case doesnt have ELSE*/
-     | IF Exp THEN Block                    { AbSyn.IfThEl($2, $4, $4, $1) }
+       /* OBS! Add precedence!! */
+     | IF Exp THEN Block %prec OptElse      { AbSyn.IfThEl($2, $4, AbSyn.Block([],[]), $1) }
      | IF Exp THEN Block ELSE Block         { AbSyn.IfThEl($2, $4, $6, $1) }
      | WHILE Exp DO Block                   { AbSyn.While($2, $4, $1) }
      | RETURN Ret                           { AbSyn.Return($2, $1) }
-     | LVal ASSIGN Exp                      { AbSyn.Assign($1, $3, (0,0))}
+     | ID ASSIGN Exp                        { AbSyn.Assign(AbSyn.Var(#1 $1), $3, #2 $1)}
+     | ID LBRA Exps RBRA ASSIGN Exp         { AbSyn.Assign(AbSyn.Index(#1 $1, $3), $6, #2 $1)}
 ;
 
 /* L-Values and Expressions */
-LVal : ID                                   {AbSyn.Var (#1 $1)}
-     | ID LBRA Exps RBRA                    {AbSyn.Index (#1 $1, $3)}
-;
+//LVal : ID                                   {}
+//     | ID LBRA Exps RBRA                    {}
+//;
 
 Ret : Exp                                   { SOME $1 }
     |                                       { NONE }
@@ -115,7 +116,8 @@ Exp : NUMLIT                                { AbSyn.Literal (AbSyn.BVal (AbSyn.N
     | CHALIT                                { AbSyn.Literal (AbSyn.BVal (AbSyn.Chr (#1 $1)) , #2 $1) }
     | STRLIT                                { AbSyn.StrLit $1 }
     | LCBR Exps RCBR                        { AbSyn.ArrLit ($2, $1) }
-//    | LVal                                  { AbSyn.LValue (1,$1) }
+    | ID                                    { AbSyn.LValue(AbSyn.Var (#1 $1),#2 $1)}
+    | ID LBRA Exps RBRA                     { AbSyn.LValue(AbSyn.Index (#1 $1, $3), #2 $1)}
     | NOT Exp                               { AbSyn.Not ($2, $1) }
     | LPAR Exp RPAR                         { $2}
     | ID LPAR CallParams RPAR               { AbSyn.FunApp (#1 $1, $3, #2 $1) }
@@ -148,7 +150,7 @@ Decs : Decs Dec SEMICOLON                   { $1 @ [$2] }
 Type : INT                                  {AbSyn.Int $1}
      | CHAR                                 {AbSyn.Char $1}
      | BOOL                                 {AbSyn.Bool $1}
-//     | ARRAYOF                              {AbSyn.Array ($1,$1) }
+     | ARRAYOF Type                         {AbSyn.Array ($2,$1) }
 ;
 
 /* Function and Procedure Parameters and Index Lists */
