@@ -235,9 +235,9 @@ struct
             val c2 = compileExp(vtable, e2, t2)
             val lA = "_and_" ^ newName()
         in c1 (* do first part, skip 2nd part if already false *)
-           @ [Mips.MOVE (t1,place), Mips.BEQ (place, "0", lA) ]
+           @ [Mips.MOVE (place, t1), Mips.BEQ (place, "0", lA) ]
            @ c2 (* when here, t1 was  true, so the result is t2 *)
-           @ [Mips.MOVE (t2, place), Mips.LABEL lA ]
+           @ [Mips.MOVE (place, t2), Mips.LABEL lA ]
         end
 
     (* Task 2: Some code-generation of operators should occur here. *)
