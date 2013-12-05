@@ -18,7 +18,7 @@
     xxx123 % Fill in ku numberplate
   \and
     Zeerak Waseem\\
-    xxx123 % Fill in ku numberplate
+    csp265 % Fill in ku numberplate
 }
 \begin{document}
 \maketitle
@@ -46,11 +46,11 @@ Write here \ldots
 \section{Analysis}
 \subsection{Parser}
 \subsubsection{Identifying tokens}
-In our abstract parser definition most of our tokens use the type $<int*int>$. This type is the position of the token, which is constructed by line and character. If nothing is stated in the tables, this is the type used.
+In our abstract parser definition most of our tokens use the type $<int*int>$. This type is the position of the token, which is constructed by line and column. If nothing is stated in the tables, this is the type used.
 
-We have ifdentified the list of terminals and given everyone of them keywords, for use later in the abstract parser definition.
+We have identified the list of terminals and given each a keyword, for later use in the abstract parser definition.
 
-All the keywords of the Paladim language is listed in table \ref{tab:keywords}, these only use the positional data, meaning they all have token type $<int*int>$, since we have chosen to denote the position by linenumber and character in the line.
+All the keywords of the Paladim language is listed in table \ref{tab:keywords}, these only use the positional data, meaning they all have token type $<int*int>$, since we have chosen to denote the position by linenumber and column in the line.
 
 \begin{table}[h!]
 \centering
