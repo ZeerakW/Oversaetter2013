@@ -8,6 +8,8 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{epstopdf}
+%\usepackage{minted}
+\usepackage{verbments}
 
 \title{A Compiler for the \textbf{Paladim} Language}
 \author{
@@ -18,16 +20,20 @@
     xxx123 % Fill in ku numberplate
   \and
     Zeerak Waseem\\
-    csp265 % Fill in ku numberplate
+    csp265
 }
 \begin{document}
 \maketitle
 
 \section{Introduction}
-Write here \ldots
+In this report we will document the changes we have made to the Paladim language thus far.\\
+We were given the assignment to implement certain tasks. For this status report, we were asked to implement a parser for the Paladim language.\\
+The parser was implemented by creating a new grammar file, which has been handed in with this assignment, it can be found in the \texttt{SRC} folder.
 
 \section{Background}
-Write here \ldots
+
+% TODO: Not sure what to write here that hasn't already been stated in the introduction. Any suggestions?
+
 %\pgfversion
 %%\begin{dot2tex}
 %digraph {
@@ -76,7 +82,7 @@ Terminal & Keyword \\
 We also need keywords for the specific types, since we should be able to write the following as noted in (\ref{eq:varname_type}). The keyword is written in Table \ref{tab:type_keywords}.
 \begin{align}
 \label{eq:varname_type}
-\text{VariableName} \textbf{ : } \text{Type}. % Is this a TODO?
+\text{VariableName} \textbf{ : } \text{Type}. 
 \end{align}
 
 \begin{table}[h!]
@@ -129,7 +135,7 @@ Terminal & Keyword \\
 \caption{\label{tab:arithmetics}Arithmetics}
 \end{table}
 
-Parantheses is covered in table \ref{tab:parentheses}. % Could this be put into the symbols?
+Parantheses is covered in table \ref{tab:parentheses}. They have been given their own table as to represent the structure of the lexer. 
 
 \begin{table}[h!]
 \centering
