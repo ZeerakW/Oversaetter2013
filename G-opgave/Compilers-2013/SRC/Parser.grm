@@ -31,10 +31,10 @@
 /* Lowest precedence in top */
 %nonassoc OptElse
 %nonassoc ELSE
-%right OR
-%right AND
-%nonassoc NOT
-%nonassoc EQUAL LESS
+%left OR
+%left AND
+%left NOT
+%left EQUAL LESS
 %left PLUS MINUS
 %left TIMES DIVIDE
 //%left       /* Left associative */ 

@@ -24,10 +24,14 @@
 }
 \begin{document}
 \maketitle
+
 \newpage
+\tableofcontents
 \section{Introduction}
-In this report we will document the changes we have made to the Paladim language thus far.\\
-We were given the assignment to implement certain tasks. For this status report, we were asked to implement a parser for the Paladim language.\\
+In this report we will document the changes we have made to the Paladim language thus far.
+
+We were given the assignment to implement certain tasks. For this status report, we were asked to implement a parser for the Paladim language.
+
 The parser was implemented by creating a new grammar file, which has been handed in with this assignment, it can be found in the \texttt{SRC} folder.
 
 \section{Background}
@@ -152,8 +156,8 @@ Terminal & Keyword \\
 \text{\}} & RCBR \\
 \text{[} & LBRA \\
 \text{]} & RBRA \\
-\end{tabular}
 \hline
+\end{tabular}
 \caption{\label{tab:parentheses}Parentheses}
 \end{table}
 
@@ -169,13 +173,14 @@ Terminal & Keyword & Type\\
 \textbf{LOGICLIT} & LOGLIT & <bool*(int*int)> \\
 \textbf{CHARLIT} & CHALIT & <char*(int*int)> \\
 \textbf{STRINGLIT} & STRLIT & <string*(int*int)> \\
-\end{tabular}
 \hline
+\end{tabular}
 \caption{\label{tab:literals}Literals}
 \end{table}
 
 \subsubsection{Precedence}
-Next task is to denote the precedence of the operators. The operators are listed by importance, top to bottom. Each operator is given a precedence score ranging from \(1-\). Finally each operator will have its associativity denoted.
+Next task is to denote the precedence of the operators as in table \ref{tab:op_precedence}. The operators are listed by importance, top to bottom. Each operator is given a precedence score ranging from \(1-8\). Finally each operator will have its associativity denoted. According to the assignment, all of the binary operators should be left-associative.
+
 \begin{table}
 \begin{center}
 \begin{tabular}{|c|c|c|}
@@ -186,51 +191,46 @@ TIMES & 1 & Left\\
 DIVIDE & 1 & Left\\
 PLUS & 2 & Left\\
 MINUS & 2 & Left\\
-EQUAL & 3 & Non Associative\\
-LESS & 3 & Non Associative\\
-NOT & 4 & Non Associative\\
-AND & 5 & Right\\
-OR & 6 & Right\\
+EQUAL & 3 & Left\\
+LESS & 3 & Left\\
+NOT & 4 & Left\\
+AND & 5 & Left\\
+OR & 6 & Left\\
 ELSE & 7 & Non Associative\\
 OptElse & 8 & Non Associative\\
+\hline
 \end{tabular}
 \end{center}
-\caption{\label{tab:op_precedence}Operator Precedence
-\hline}
+\caption{\label{tab:op_precedence}Operator Precedence}
 \end{table}
 
-\subsubsection{Non-terminals}
-Write here \ldots
+%\subsubsection{Non-terminals}
 
-\subsubsection{Productions}
-Write here \ldots
+%\subsubsection{Productions}
 
-\subsection{Integer multiplication/division}
-Write here \ldots
+%\subsection{Integer multiplication/division}
 
 \subsection{Boolean operators}
-Write here \ldots
-
 \subsection{Type inteference}
-Write here \ldots
-
 \subsection{Type checking}
-Write here \ldots
-
 \subsection{Array indexing}
-Write here \ldots
-
 \subsection{Call-by-value-result semantics}
-Write here \ldots
 
 \section{Testing}
-Write here \ldots
+We have tested our parser implementation with the included test file "parserTest.pal". This file is testing pretty much all of the different productions used in the language. We got almost all of them to work, but since we haven't implemented some few things in the type checker, we cannot run the program with some of the operations. Or and Not are two examples of this. Instead we denoted that the compiler would say typechecker failure and not parser error, when compiling - since its a typechecker error, it means the parser succesfully parsed the input.
 
 \section{Conclusion}
-Write here \ldots
 
-\section{Bibliography}
-Write here \ldots
+
+%\section{Bibliography}
+\begin{thebibliography}{9}
+\bibitem{springer2011}
+Torben Ægidius Mogensen,
+\emph{Introduction to Compiler Design}.
+Springer London,
+2011.
+\end{thebibliography}
+
 
 %\section{Appendix A: }
 %Write here \ldots
