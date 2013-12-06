@@ -1,12 +1,15 @@
 \documentclass[10pt]{article}
 \usepackage[margin=3cm]{geometry}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{array}
 \usepackage{amsmath}
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{epstopdf}
+%\usepackage{minted}
+\usepackage{verbments}
 
 \title{A Compiler for the \textbf{Paladim} Language}
 \author{
@@ -17,31 +20,219 @@
     xxx123 % Fill in ku numberplate
   \and
     Zeerak Waseem\\
-    xxx123 % Fill in ku numberplate
+    csp265
 }
 \begin{document}
 \maketitle
-
+\newpage
 \section{Introduction}
-Content goes here.
+In this report we will document the changes we have made to the Paladim language thus far.\\
+We were given the assignment to implement certain tasks. For this status report, we were asked to implement a parser for the Paladim language.\\
+The parser was implemented by creating a new grammar file, which has been handed in with this assignment, it can be found in the \texttt{SRC} folder.
 
 \section{Background}
 
+% TODO: Not sure what to write here that hasn't already been stated in the introduction. Any suggestions?
+
+%\pgfversion
+%%\begin{dot2tex}
+%digraph {
+%  rankdir = LR;
+%  node [shape=circle];
+%  start [color=white, shape=plaintext];
+%  q2 [shape=doublecircle];
+%  start -> q1;
+%  q1 -> q1 [label="a"];
+%  q2 -> q2 [label="a"];
+%  q1 -> q2 [label="b"];
+%  q2 -> q1 [label="b"];
+%}
+%\end{dot2tex}
+
 \section{Analysis}
 \subsection{Parser}
+\subsubsection{Identifying tokens}
+In our abstract parser definition most of our tokens use the type $<int*int>$. This type is the position of the token, which is constructed by line and column. If nothing is stated in the tables, this is the type used.
+
+We have identified the list of terminals and given each a keyword, for later use in the abstract parser definition.
+
+All the keywords of the Paladim language is listed in table \ref{tab:keywords}, these only use the positional data, meaning they all have token type $<int*int>$, since we have chosen to denote the position by linenumber and column in the line.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|}
+Terminal & Keyword \\
+\hline
+\textbf{program} & PROGRAM \\
+\textbf{function} & FUNCTION \\
+\textbf{procedure} & PROCEDURE \\
+\textbf{var} & VAR \\
+\textbf{begin} & BEGIN \\
+\textbf{end} & END \\
+\textbf{if} & IF \\
+\textbf{then} & THEN \\
+\textbf{else} & ELSE \\
+\textbf{while} & WHILE \\
+\textbf{do} & DO \\
+\textbf{return} & RETURN \\
+\hline
+\end{tabular}
+\caption{\label{tab:keywords}Keywords}
+\end{table}
+
+We also need keywords for the specific types, since we should be able to write the following as noted in (\ref{eq:varname_type}). The keyword is written in Table \ref{tab:type_keywords}.
+\begin{align}
+\label{eq:varname_type}
+\text{VariableName} \textbf{ : } \text{Type}. 
+\end{align}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|}
+Terminal & Keyword \\
+\hline
+\textbf{int} & INT \\
+\textbf{char} & CHAR \\
+\textbf{bool} & BOOL \\
+\textbf{array of} & ARRAYOF \\
+\textbf{of} & OF \\
+\hline
+\end{tabular}
+\caption{\label{tab:type_keywords}Type keywords}
+\end{table}
+
+Next terminals we need to consider is symbols. These are very simple and shown in table \ref{tab:symbols}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|}
+Terminal & Keyword \\
+\hline
+\textbf{;} & SEMICOLON \\
+\textbf{:} & COLON \\
+\textbf{,} & COMMA \\
+\textbf{:=} & ASSIGN \\
+\textbf{EOF} & EOF \\
+\hline
+\end{tabular}
+\caption{\label{tab:symbols}Symbols}
+\end{table}
+
+All arithmetic operators is found in table \ref{tab:arithmetics}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|}
+Terminal & Keyword \\
+\hline
+\text{+} & PLUS \\
+\text{-} & MINUS \\
+\text{*} & TIMES \\
+\text{/} & DIVIDE \\
+\text{=} & EQUAL \\
+\text{<} & LESS \\
+\textbf{AND} & AND \\
+\textbf{OR} & OR \\
+\textbf{NOT} & NOT \\
+\hline
+\end{tabular}
+\caption{\label{tab:arithmetics}Arithmetics}
+\end{table}
+
+Parantheses is covered in table \ref{tab:parentheses}. They have been given their own table as to represent the structure of the lexer. 
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|}
+Terminal & Keyword \\
+\hline
+\text{(} & LPAR \\
+\text{)} & RPAR \\
+\text{\{} & LCBR \\
+\text{\}} & RCBR \\
+\text{[} & LBRA \\
+\text{]} & RBRA \\
+\end{tabular}
+\hline
+\caption{\label{tab:parentheses}Parentheses}
+\end{table}
+
+Finally we have all of the literals, which are supposed to contain both data and a position. As seen in table \ref{tab:literals}, they all make use of some sort of variable to store their content. We also cover the Identifier here.
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{|c|c|c|}
+Terminal & Keyword & Type\\
+\hline
+\textbf{ID} & ID & <string*(int*int)>\\
+\textbf{NUMLIT} & NUMLIT & <int*(int*int)>\\
+\textbf{LOGICLIT} & LOGLIT & <bool*(int*int)> \\
+\textbf{CHARLIT} & CHALIT & <char*(int*int)> \\
+\textbf{STRINGLIT} & STRLIT & <string*(int*int)> \\
+\end{tabular}
+\hline
+\caption{\label{tab:literals}Literals}
+\end{table}
+
+\subsubsection{Precedence}
+Next task is to denote the precedence of the operators. The operators are listed by importance, top to bottom. Each operator is given a precedence score ranging from \(1-\). Finally each operator will have its associativity denoted.
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Name & Precedence & Associativity\\
+\hline
+TIMES & 1 & Left\\
+DIVIDE & 1 & Left\\
+PLUS & 2 & Left\\
+MINUS & 2 & Left\\
+EQUAL & 3 & Non Associative\\
+LESS & 3 & Non Associative\\
+NOT & 4 & Non Associative\\
+AND & 5 & Right\\
+OR & 6 & Right\\
+ELSE & 7 & Non Associative\\
+OptElse & 8 & Non Associative\\
+\end{tabular}
+\end{center}
+\caption{\label{tab:op_precedence}Operator Precedence
+\hline}
+\end{table}
+
+\subsubsection{Non-terminals}
+Write here \ldots
+
+\subsubsection{Productions}
+Write here \ldots
+
 \subsection{Integer multiplication/division}
+Write here \ldots
+
 \subsection{Boolean operators}
+Write here \ldots
+
 \subsection{Type inteference}
+Write here \ldots
+
 \subsection{Type checking}
+Write here \ldots
+
 \subsection{Array indexing}
+Write here \ldots
+
 \subsection{Call-by-value-result semantics}
+Write here \ldots
 
 \section{Testing}
+Write here \ldots
 
 \section{Conclusion}
+Write here \ldots
 
 \section{Bibliography}
+Write here \ldots
 
 %\section{Appendix A: }
+%Write here \ldots
 
 \end{document}
