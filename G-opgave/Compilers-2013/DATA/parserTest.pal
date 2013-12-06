@@ -1,0 +1,74 @@
+// Test prog production
+program parserTest;
+
+// First lets test functions
+function test() : int // Simple function with no arguments
+   return 0
+;
+
+function test2(a : int) : int // Function with arguments
+   return a
+;
+
+procedure writeTest(c : char)
+begin
+   write(c);
+end;
+
+procedure main()
+// Stating type of variables
+var t : bool ; p : int; i : int;
+begin
+   write("Starting test of functions (including return)\n");
+   write(test());
+   write(test2(5));
+   write("\nStarting test of procedure definitions and procedure call\n");
+   writeTest('c');
+   write("\nStarting test of logical expressions/variables\n");
+   t := true;
+   write(false and false);
+   write(t and false);
+   write(false and t);
+   write(t and true);
+   // Not implemented in type checker
+   //write(false or false);
+   //write(true or false);
+   //write(false or true);
+   //write(true or true);
+   //write(not false);
+   //write(not true);
+   //Output should be 0001011110
+   write("\nTesting if-then\np = ");
+   if true then
+      p := 10;
+   write(p);
+   write("\nTesting if-then-else\np = ");
+   if 1 = 2 then
+      p := 5
+   else
+      p := 20;
+   write(p);
+   write("\nTesting mathematical operators in order: +, -, *, /\n");
+   write("p + p = ");
+   write(p + p);
+   write("\np - p = ");
+   write(p - p);
+   // Not implemented in type checker
+   //write(p * p);
+   //write(p / p);
+   write("\nTesting simple array literal\n");
+   write({1, 3, 5, 7, 9});
+   write("\nTesting while loop and less operator\n");
+   while (i < 11) do
+   begin
+      write(i);
+      write(" ");
+      i := i + 1;
+   end;
+   
+   write("\n");
+   write(chr(247));
+   write("\n");
+   write(ord('a'));
+   write("\nDone with testing");   
+end; // Main
