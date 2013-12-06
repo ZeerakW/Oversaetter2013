@@ -17,7 +17,7 @@
     nhg665
   \and
     Konstantin Slavin-Borovskij\\
-    xxx123 % Fill in ku numberplate
+    wfb603
   \and
     Zeerak Waseem\\
     csp265
@@ -204,23 +204,31 @@ OptElse & 8 & Non Associative\\
 \caption{\label{tab:op_precedence}Operator Precedence}
 \end{table}
 
-%\subsubsection{Non-terminals}
+%\subsubsection{}
 
-%\subsubsection{Productions}
+\subsubsection{Productions}
+Last task for making the compiler is to write down each of the productions. We ran into a few problems with the handed out language, with both the operators between expression $Exp \rightarrow Exp \text{ OP } Exp$ but also $Exp \rightarrow LVal$.
 
-%\subsection{Integer multiplication/division}
+\subsection{Linking parser}
+The last step to create a new parser, is to link the compiler to use the new implementation of the SLR(1) parser, instead of the handed out LL(1) parser. This was done in the file \textit{"Driver.sml"}.
+
+\subsection{Integer multiplication/division}
+The multiplication and division is both fully supported by the parser, next step is to implement the feature in the type checker.
 
 \subsection{Boolean operators}
+Boolean operators is now fully supported by the lexer and parser. The next task to implement this feature is to implement the type checking for these operations.
+
 \subsection{Type inteference}
+
 \subsection{Type checking}
 \subsection{Array indexing}
 \subsection{Call-by-value-result semantics}
 
 \section{Testing}
-We have tested our parser implementation with the included test file "parserTest.pal". This file is testing pretty much all of the different productions used in the language. We got almost all of them to work, but since we haven't implemented some few things in the type checker, we cannot run the program with some of the operations. Or and Not are two examples of this. Instead we denoted that the compiler would say typechecker failure and not parser error, when compiling - since its a typechecker error, it means the parser succesfully parsed the input.
+We have tested our parser implementation with the included test file \textit{"parserTest.pal"}. This file is testing pretty much all of the different productions used in the language. We got almost all of them to work, but since we haven't implemented some few things in the type checker, we cannot run the program with some of the operations. Or and Not are two examples of this. Instead we denoted that the compiler would say typechecker failure and not parser error, when compiling - since its a typechecker error, it means the parser succesfully parsed the input.
 
 \section{Conclusion}
-
+The milestone has been met, according to the assignment specification. The tests clearly indicate this.
 
 %\section{Bibliography}
 \begin{thebibliography}{9}
