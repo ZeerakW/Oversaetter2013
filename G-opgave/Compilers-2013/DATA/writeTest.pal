@@ -6,8 +6,19 @@ begin
    write(true and false);
    write(false and true);
    write(true and true);
-   write(false or false);
-   write(true or false);
-   write(false or true);
-   write(true or true);
+   if false then
+      write(false or false);
+      write(true or false);
+      write(false or true);
+      write(true or true);
+      write(not false);
+      write(not true);
+    begin
+      write("\nL00L");
+      write(" this semicolon is weird!");
+    end
+   else
+   write("\nA bit strange?!");
+   
+   // Output should be 0001011110
 end; // main
