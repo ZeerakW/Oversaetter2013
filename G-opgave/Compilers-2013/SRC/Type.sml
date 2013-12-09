@@ -197,10 +197,25 @@ struct
         end
 
     (* Task 2 and 3: Some type-checking of operators should occur here. *)
-    | typeCheckExp ( vtab, AbSyn.Times (_, _, pos), _ ) =
-        raise Error ( "Task 2 not implemented yet in type-checker ", pos )
-    | typeCheckExp ( vtab, AbSyn.Div   (_, _, pos), _ ) =
-        raise Error ( "Task 2 not implemented yet in type-checker ", pos )
+    | typeCheckExp ( vtab, AbSyn.Times (e1, e2, pos), _ ) =
+        let val e1_new = typeCheckExp(vtab, e1, UnknownType )
+            val e2_new = typeCheckExp(vtab, e2, UnknownType )
+            val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+        in if  typesEqual(BType Int, tp1) andalso typesEqual(BType Int, tp2)
+           then Times(e1_new, e2_new, pos)
+           else raise Error("in type check times exp, one argument is not of int type "^
+                             pp_type tp1^" and "^pp_type tp2^" at ", pos)
+        end
+
+    | typeCheckExp ( vtab, AbSyn.Div   (e1, e2, pos), _ ) =
+        let val e1_new = typeCheckExp(vtab, e1, UnknownType )
+            val e2_new = typeCheckExp(vtab, e2, UnknownType )
+            val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+        in if  typesEqual(BType Int, tp1) andalso typesEqual(BType Int, tp2)
+           then Div(e1_new, e2_new, pos)
+           else raise Error("in type check div exp, one argument is not of int type "^
+                             pp_type tp1^" and "^pp_type tp2^" at ", pos)
+        end
 
       (* Must be modified to complete task 3 *)
     | typeCheckExp ( vtab, AbSyn.Equal(e1, e2, pos), _ ) =

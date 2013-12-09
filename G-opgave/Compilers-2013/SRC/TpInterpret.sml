@@ -477,11 +477,16 @@ and evalExp ( Literal(lit,_), vtab, ftab ) = lit
         in  evalBinop(op -, res1, res2, pos)
         end
 
-    (* Task 2: Some evaluation of operators should occur here. *)
   | evalExp ( Times(e1, e2, pos), vtab, ftab ) =
-        raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )
+        let val res1   = evalExp(e1, vtab, ftab)
+            val res2   = evalExp(e2, vtab, ftab)
+        in  evalBinop(op *, res1, res2, pos)
+        end
   | evalExp ( Div(e1, e2, pos), vtab, ftab ) =
-        raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )
+        let val res1   = evalExp(e1, vtab, ftab)
+            val res2   = evalExp(e2, vtab, ftab)
+        in  evalBinop(op div, res1, res2, pos)
+        end
 
   | evalExp ( Equal(e1, e2, pos), vtab, ftab ) =
         let val r1 = evalExp(e1, vtab, ftab)

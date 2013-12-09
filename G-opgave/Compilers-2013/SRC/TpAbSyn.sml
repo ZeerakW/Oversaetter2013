@@ -168,6 +168,8 @@ struct
     | pp_exp (ArrLit  (els, _, _))  = " { " ^ pp_exps els ^ " } "
     | pp_exp (LValue  (lv,     _))  = pp_Lval lv
 
+    | pp_exp (Times (e1, e2, _))    = "( " ^ pp_exp e1 ^ " * " ^ pp_exp e2 ^ " )"
+    | pp_exp (Div   (e1, e2, _))    = "( " ^ pp_exp e1 ^ " * " ^ pp_exp e2 ^ " )"
     | pp_exp (Plus  (e1, e2, _))    = "( " ^ pp_exp e1 ^ " + " ^ pp_exp e2 ^ " )"
     | pp_exp (Minus (e1, e2, _))    = "( " ^ pp_exp e1 ^ " - " ^ pp_exp e2 ^ " )"
     | pp_exp (Equal (e1, e2, _))    = "( " ^ pp_exp e1 ^ " = " ^ pp_exp e2 ^ " )"
@@ -334,6 +336,8 @@ struct
   fun typeOfExp ( Literal(v,  _) ) = typeOfVal v
     | typeOfExp ( StrLit (_,  _) ) = Array(1,Char)
     | typeOfExp ( ArrLit (_,t,_) ) = t
+    | typeOfExp ( Times  (a,b,_) ) = typeOfExp a
+    | typeOfExp ( Div    (a,b,_) ) = typeOfExp a
     | typeOfExp ( Plus   (a,b,_) ) = typeOfExp a
     | typeOfExp ( Minus  (a,b,_) ) = typeOfExp a
     | typeOfExp ( Equal  (_,_,_) ) = BType Bool
