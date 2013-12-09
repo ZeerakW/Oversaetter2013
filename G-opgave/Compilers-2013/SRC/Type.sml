@@ -176,8 +176,8 @@ struct
 
       (* Must be modified to complete task 3 *)
     | typeCheckExp( vtab, AbSyn.Plus (e1, e2, pos), _ ) =
-        let val e1_new = typeCheckExp( vtab, e1, UnknownType )
-            val e2_new = typeCheckExp( vtab, e2, UnknownType )
+        let val e1_new = typeCheckExp( vtab, e1, KnownType (BType Int) )
+            val e2_new = typeCheckExp( vtab, e2, KnownType (BType Int) )
             val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
         in  if  typesEqual(BType Int, tp1) andalso typesEqual(BType Int, tp2)
             then Plus(e1_new, e2_new, pos)
@@ -187,8 +187,8 @@ struct
 
       (* Must be modified to complete task 3 *)
     | typeCheckExp( vtab, AbSyn.Minus (e1, e2, pos), _ ) =
-        let val e1_new = typeCheckExp(vtab, e1, UnknownType )
-            val e2_new = typeCheckExp(vtab, e2, UnknownType )
+        let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Int) )
+            val e2_new = typeCheckExp(vtab, e2, KnownType (BType Int) )
             val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
         in  if  typesEqual(BType Int, tp1) andalso typesEqual(BType Int, tp2)
             then Minus(e1_new, e2_new, pos)
@@ -198,8 +198,8 @@ struct
 
     (* Task 2 and 3: Some type-checking of operators should occur here. *)
     | typeCheckExp ( vtab, AbSyn.Times (e1, e2, pos), _ ) =
-        let val e1_new = typeCheckExp(vtab, e1, UnknownType )
-            val e2_new = typeCheckExp(vtab, e2, UnknownType )
+        let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Int) )
+            val e2_new = typeCheckExp(vtab, e2, KnownType (BType Int) )
             val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
         in if  typesEqual(BType Int, tp1) andalso typesEqual(BType Int, tp2)
            then Times(e1_new, e2_new, pos)
@@ -208,8 +208,8 @@ struct
         end
 
     | typeCheckExp ( vtab, AbSyn.Div   (e1, e2, pos), _ ) =
-        let val e1_new = typeCheckExp(vtab, e1, UnknownType )
-            val e2_new = typeCheckExp(vtab, e2, UnknownType )
+        let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Int) )
+            val e2_new = typeCheckExp(vtab, e2, KnownType (BType Int) )
             val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
         in if  typesEqual(BType Int, tp1) andalso typesEqual(BType Int, tp2)
            then Div(e1_new, e2_new, pos)
@@ -219,8 +219,9 @@ struct
 
       (* Must be modified to complete task 3 *)
     | typeCheckExp ( vtab, AbSyn.Equal(e1, e2, pos), _ ) =
-       let val e1_new = typeCheckExp(vtab, e1, UnknownType)
-            val e2_new = typeCheckExp(vtab, e2, UnknownType )
+       let val e1_new = typeCheckExp(vtab, e1, UnknownType )
+            val tp1 = typeOfExp e1_new
+            val e2_new = typeCheckExp(vtab, e2, KnownType (tp1) )
             val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
             (* check that tp1 is not an array type *)
             val () = case tp1 of
@@ -235,8 +236,8 @@ struct
 
       (* Must be modified to complete task 3 *)
     | typeCheckExp ( vtab, AbSyn.Less (e1, e2, pos), _ ) =
-        let val e1_new = typeCheckExp(vtab, e1, UnknownType)
-            val e2_new = typeCheckExp(vtab, e2, UnknownType )
+        let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Int))
+            val e2_new = typeCheckExp(vtab, e2, KnownType (BType Int) )
             val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
             (* check that tp1 is not an array type *)
             val () = case tp1 of
@@ -251,8 +252,8 @@ struct
 
       (* Must be modified to complete task 3 *)
     | typeCheckExp ( vtab, AbSyn.And (e1, e2, pos), _ ) =
-        let val e1_new = typeCheckExp(vtab, e1, UnknownType )
-            val e2_new = typeCheckExp(vtab, e2, UnknownType )
+        let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Bool) )
+            val e2_new = typeCheckExp(vtab, e2, KnownType (BType Bool) )
             val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
         in  if  typesEqual(BType Bool, tp1) andalso typesEqual(BType Bool, tp2)
             then And(e1_new, e2_new, pos)
@@ -262,8 +263,8 @@ struct
 
     (* Task 2 and 3: Some type-checking of operators should occur here. *)
     | typeCheckExp ( vtab, AbSyn.Or  (e1, e2, pos), _ ) =
-        let val e1_new = typeCheckExp(vtab, e1, UnknownType )
-            val e2_new = typeCheckExp(vtab, e2, UnknownType )
+        let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Bool) )
+            val e2_new = typeCheckExp(vtab, e2, KnownType (BType Bool) )
             val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
         in
             if typesEqual(BType Bool, tp1) andalso typesEqual(BType Bool, tp2)
@@ -273,7 +274,7 @@ struct
         end
 
     | typeCheckExp ( vtab, AbSyn.Not (e1,    pos), _ ) =
-        let val e1_new = typeCheckExp(vtab, e1, UnknownType )
+        let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Bool) )
             val tp1 = typeOfExp e1_new
         in  if  typesEqual(BType Bool, tp1)
             then Not(e1_new, pos)
@@ -304,6 +305,7 @@ struct
         raise Error("In type checking call to function len, "^
                     "len should take two args, an int and an array, given "^
                     Int.toString (length args) ^", at ", pos)
+
     | typeCheckExp ( vtab, AbSyn.FunApp ("read", [], pos), KnownType (BType btp) ) =
         FunApp( ( "read", ([], SOME (BType btp)) ), [], pos )
     | typeCheckExp ( vtab, AbSyn.FunApp ("read", [], pos), KnownType tp ) =
@@ -311,7 +313,7 @@ struct
                     "expected type is not a basic type: "^pp_type tp^", at ", pos)
     | typeCheckExp ( vtab, AbSyn.FunApp ("read", [], pos), _ ) =
         raise Error("in type check call to read, type inference fails because "^
-                    "of unknwon expected type, at ", pos)
+                    "of unknown expected type, at ", pos)
 
         (* function call to `new' uses expected type to infer the to-be-read result *)
     | typeCheckExp ( vtab, AbSyn.FunApp ("new", args, pos), etp ) =
@@ -336,7 +338,7 @@ struct
                         (***        )'                                             ***)
                         (*************************************************************)
           | NONE     => raise Error("in type check call to new, type inference fails because "^
-                                    "of unknwon expected basic type, at ", pos) )
+                                    "of unknown expected basic type, at ", pos) )
 
         (* all the other, i.e., regular, function calls *)
     | typeCheckExp ( vtab, AbSyn.FunApp (fid, args, pos), _ ) =

@@ -73,5 +73,7 @@ begin
    write(chr(247));
    write("\n");
    write(ord('a'));
+   write("\n");
+   if (chr(read()) = read()) then write("YaY");
    write("\nDone with testing");   
 end; // Main
