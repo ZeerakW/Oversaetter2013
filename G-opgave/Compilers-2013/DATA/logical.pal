@@ -17,8 +17,21 @@ begin
    x := 2;
    y := 3;
    z := 12;
-
-   if (andTest(x) and not andTest(12) and orTest(z) and
-       orTest(y-z) and notTest(2) and notTest(7)) then
-     write("1");
+   if (andTest(x) and not andTest(12) and orTest(z) and orTest(y-z) and notTest(2) and notTest(7)) then
+     write("It doesnt work :(");
+   if (andTest(x) and not andTest(12) and orTest(z) and orTest(y-z)) then
+     write("It Works! :)");
 end;
+
+// Manual tests
+//write("OR  False, False, True\n");
+//write(orTest(x));
+//write(orTest(y));
+//write(orTest(z));
+//write("\nNOT False, False, False\n");
+//write(notTest(x));
+//write(notTest(y));
+//write(notTest(z));
+//write("\nNOT False, True\n");
+//write(not true);
+//write(not false);

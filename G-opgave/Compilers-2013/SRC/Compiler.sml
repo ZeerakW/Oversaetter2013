@@ -202,12 +202,10 @@ struct
         end
 
     (* Task 2: Some code-generation of operators should occur here. *)
-(*
     | compileExp( vtable, Times(e1, e2, pos), place ) =
         raise Error ( "Task 2 not implemented yet in code generator ", pos )
     | compileExp( vtable, Div(e1, e2, pos), place ) =
         raise Error ( "Task 2 not implemented yet in code generator ", pos )
-*)
 
     | compileExp( vtable, Equal(e1, e2, _), place ) =
         let val t1 = "eq1_" ^ newName()
@@ -241,12 +239,27 @@ struct
         end
 
     (* Task 2: Some code-generation of operators should occur here. *)
-(*
     | compileExp( vtable, Or(e1, e2, pos), place ) =
-        raise Error ( "Task 2 not implemented yet in code generator ", pos )
+        let val t1 = "or1_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+            val t2 = "or2_" ^ newName()
+            val c2 = compileExp(vtable, e2, t2)
+            val lO = "_or_" ^ newName()
+        in c1 (* do first part, skip 2nd part if already false *)
+           @ [Mips.MOVE (place, t1), Mips.BNE (place, "0", lO) ]
+           @ c2 (* when here, t1 was  true, so the result is t2 *)
+           @ [Mips.MOVE (place, t2), Mips.LABEL lO ]
+        end
+
     | compileExp( vtable, Not(e1, pos), place ) =
-        raise Error ( "Task 2 not implemented yet in code generator ", pos )
-*)
+        let val t1 = "not1_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+            (*val lN = "_not_" ^ newName()*)
+        in c1 (* do first part, skip 2nd part if already false *)
+           @ [ Mips.XORI (place, t1, "1") ] (*, Mips.LABEL lN ]*)
+           (*@ c2 (* when here, t1 was  true, so the result is t2 *)
+           @ [Mips.MOVE (place, t1), Mips.BEQ (place, "0", lA) ]*)
+        end
 
     | compileExp( vtab, FunApp (("len",(_,_)),args,pos), place ) =
        ( case args of
