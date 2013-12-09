@@ -499,18 +499,16 @@ and evalExp ( Literal(lit,_), vtab, ftab ) = lit
 	in  evalAnd(r1, r2, pos)
 	end
 
-    (* Task 2: Some evaluation of operators should occur here. *)
   | evalExp ( Or(e1, e2, pos), vtab, ftab ) =
         let val r1 = evalExp(e1, vtab, ftab)
             val r2 = evalExp(e2, vtab, ftab)
 	     in  evalOr(r1, r2, pos)
      	  end
-        (*raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )*)
+
   | evalExp ( Not(e1, pos), vtab, ftab ) =
         let val r1 = evalExp(e1, vtab, ftab)
 	     in  evalNot(r1, pos)
      	  end
-        (*raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )*)
 
 
   (************************************************************************)
