@@ -120,8 +120,13 @@ fun evalAnd (BVal (Log b1), BVal (Log b2), pos) = BVal (Log (b1 andalso b2))
 
 fun evalOr (BVal (Log b1), BVal (Log b2), pos) = BVal (Log (b1 orelse b2))
   | evalOr (v1, v2, pos) =
-        raise Error( "And: argument types do not match. Arg1: " ^
+        raise Error( "Or: argument types do not match. Arg1: " ^
                       pp_val v1 ^ ", arg2: " ^ pp_val v2, pos )
+
+fun evalNot (BVal (Log b1), pos) = BVal (Log (not b1))
+  | evalNot (v1, pos) =
+        raise Error( "Not: argument types do not match. Arg1: " ^
+                      pp_val v1, pos )
 
 (***********************************************)
 (*** Getting/Setting an Array Index,         ***)
@@ -473,12 +478,10 @@ and evalExp ( Literal(lit,_), vtab, ftab ) = lit
         end
 
     (* Task 2: Some evaluation of operators should occur here. *)
-(*
   | evalExp ( Times(e1, e2, pos), vtab, ftab ) =
         raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )
   | evalExp ( Div(e1, e2, pos), vtab, ftab ) =
         raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )
-*)
 
   | evalExp ( Equal(e1, e2, pos), vtab, ftab ) =
         let val r1 = evalExp(e1, vtab, ftab)
@@ -497,7 +500,6 @@ and evalExp ( Literal(lit,_), vtab, ftab ) = lit
 	end
 
     (* Task 2: Some evaluation of operators should occur here. *)
-
   | evalExp ( Or(e1, e2, pos), vtab, ftab ) =
         let val r1 = evalExp(e1, vtab, ftab)
             val r2 = evalExp(e2, vtab, ftab)
@@ -505,7 +507,10 @@ and evalExp ( Literal(lit,_), vtab, ftab ) = lit
      	  end
         (*raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )*)
   | evalExp ( Not(e1, pos), vtab, ftab ) =
-        raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )
+        let val r1 = evalExp(e1, vtab, ftab)
+	     in  evalNot(r1, pos)
+     	  end
+        (*raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )*)
 
 
   (************************************************************************)
