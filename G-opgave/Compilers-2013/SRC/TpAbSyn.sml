@@ -391,11 +391,15 @@ struct
     | posOfExp  ( StrLit (_,  p) ) = p
     | posOfExp  ( ArrLit (_,_,p) ) = p
     | posOfExp  ( LValue (_,  p) ) = p
+    | posOfExp  ( Times  (_,_,p) ) = p
+    | posOfExp  ( Div    (_,_,p) ) = p
     | posOfExp  ( Plus   (_,_,p) ) = p
     | posOfExp  ( Minus  (_,_,p) ) = p
     | posOfExp  ( Equal  (_,_,p) ) = p
     | posOfExp  ( Less   (_,_,p) ) = p
     | posOfExp  ( And    (_,_,p) ) = p
+    | posOfExp  ( Or     (_,_,p) ) = p
+    | posOfExp  ( Not    (_,p)   ) = p
     | posOfExp  ( FunApp (_,_,p) ) = p
     | posOfExp  ( Map    (_,_,p) ) = p
 
