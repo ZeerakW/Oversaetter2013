@@ -12,7 +12,7 @@
 %token <(int*int)> WHILE DO RETURN
 
 /* Type Keywords */
-%token <(int*int)> INT CHAR BOOL ARRAYOF OF
+%token <(int*int)> INT CHAR BOOL ARRAY OF
 
 /* Symbols */
 %token <(int*int)> SEMICOLON COLON COMMA ASSIGN EOF  /* ASSIGN = ':=' */
@@ -146,7 +146,7 @@ Decs : Decs Dec SEMICOLON                   { $1 @ [$2] }
 Type : INT                                  {AbSyn.Int $1}
      | CHAR                                 {AbSyn.Char $1}
      | BOOL                                 {AbSyn.Bool $1}
-     | ARRAYOF Type                         {AbSyn.Array ($2,$1) }
+     | ARRAY OF Type                        {AbSyn.Array ($3,$1) }
 ;
 
 /* Function and Procedure Parameters and Index Lists */

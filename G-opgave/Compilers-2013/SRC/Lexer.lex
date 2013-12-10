@@ -41,7 +41,7 @@
        | "while"        => Parser.WHILE      pos
        | "do"           => Parser.DO         pos
        | "return"       => Parser.RETURN     pos
-       | "array"        => Parser.ARRAYOF    pos
+       | "array"        => Parser.ARRAY      pos
        | "of"           => Parser.OF         pos
        | "int"          => Parser.INT        pos
        | "bool"         => Parser.BOOL       pos

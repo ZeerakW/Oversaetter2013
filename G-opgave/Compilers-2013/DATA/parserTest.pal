@@ -17,11 +17,13 @@ end;
 
 procedure main()
 // Stating type of variables
-var t : bool ; p : int; i : int;
+var t : bool ; p : int; i : int; a : array of array of int;
 begin
    write("Starting test of functions (including return)\n");
-   write(test());
-   write(test2(5));
+   if test()=0 and test2(5)=5 then
+      write ("OK");
+   //write(test()=0);
+   //write(test2(5)=5);
    write("\nStarting test of procedure definitions and procedure call\n");
    writeTest('c');
    write("\nStarting test of logical expressions/variables\n");
@@ -38,6 +40,13 @@ begin
    write(not false);
    write(not true);
    //Output should be 0001011110
+   write("\nTesting comparison operator\n");
+   write(4=5);
+   write(5=5);
+   write(1+2+3=6);
+   write('c'='d');
+   write('a'='a');
+   // SHould be 01101
    write("\nTesting if-then\np = ");
    if true then
       p := 10;
@@ -61,19 +70,32 @@ begin
    write(p / 2);
    write("\nTesting simple array literal\n");
    write({1, 3, 5, 7, 9});
-   write("\nTesting while loop and less operator\n");
+   write("\nTesting while loop and less operator, write a sequence from 0 to 10\n");
    while (i < 11) do
    begin
       write(i);
       write(" ");
       i := i + 1;
    end;
-   
-   write("\n");
+
+   write("\nSymbol for ASCII number 247: ");
    write(chr(247));
-   write("\n");
+   write("\nASCII number for symbol a  : ");
    write(ord('a'));
-   write("\n");
-   if (chr(read()) = read()) then write("YaY");
+   
+   //write("\nPlease write an integer followed by a character\n");
+   //if (chr(read()) = read()) then
+   //   write("YaY")
+   //else
+   //   write("No match");
+
+   //write(read() + read());
+   //write(read() - read());
+   //write(not read());
+   write(read() or read() and read()); // This one is quite epic (if first case is true, then it imediately returns true without checking the rest [NOT IN INTERPRETER])
+   
+   // Unimplemented
+   new(3,4);
+   //a[0] := 1;
    write("\nDone with testing");   
 end; // Main
