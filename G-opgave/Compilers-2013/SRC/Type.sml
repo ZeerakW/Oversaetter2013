@@ -222,7 +222,7 @@ struct
        let val e1_new = typeCheckExp(vtab, e1, UnknownType )
             val tp1 = typeOfExp e1_new
             val e2_new = typeCheckExp(vtab, e2, KnownType (tp1) )
-            val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+            val tp2 = typeOfExp e2_new
             (* check that tp1 is not an array type *)
             val () = case tp1 of
                        Array _ => raise Error("in type check equal, first expression "^pp_exp e1_new^
