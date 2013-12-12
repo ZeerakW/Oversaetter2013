@@ -46,7 +46,7 @@
 %type <AbSyn.FunDec list> FunDecs
 %type <AbSyn.FunDec> FunDec
 %type <AbSyn.StmtBlock> Block
-%type <AbSyn.Dec list> DBlock
+//%type <AbSyn.Dec list> DBlock
 %type <AbSyn.Stmt list> SBlock
 %type <AbSyn.Stmt list> StmtSeq
 %type <AbSyn.Stmt> Stmt
@@ -77,12 +77,14 @@ FunDec : FUNCTION ID LPAR PDecl RPAR COLON Type Block SEMICOLON { AbSyn.Func ($7
                                                                 /* Identifier, PDecl, Block, proc pos */
 ;
 
-Block : DBlock SBlock                       { AbSyn.Block ($1, $2) }
+//Block : DBlock SBlock                       { AbSyn.Block ($1, $2) }
+Block : VAR Decs SBlock                      { AbSyn.Block ($2, $3) }
+      | SBlock                               { AbSyn.Block ([], $1) }
 ;
 
-DBlock : VAR Decs                           { $2 }
+/*DBlock : VAR Decs                           { $2 }
        |                                    { [] }
-;
+;*/
 
 SBlock : BEGIN StmtSeq SEMICOLON END        { $2 }
        | Stmt                               { [$1] }
