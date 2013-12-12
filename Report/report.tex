@@ -221,6 +221,12 @@ Boolean operators is now fully supported by the lexer and parser. The next task 
 \subsection{Type inteference}
 
 \subsection{Type checking}
+* To check the type we needed to add support for checking the type of Or and Not in TpAbSyn
+* We also uncommented Or and Not in the TpAbSyn structure
+
+Interpreter:
+It is important to add pretty printing functionality for all new expressions, since the TpInterpreter is using these functions to print the code being interpreted.
+
 \subsection{Array indexing}
 \subsection{Call-by-value-result semantics}
 
