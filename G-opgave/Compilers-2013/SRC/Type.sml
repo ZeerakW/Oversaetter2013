@@ -318,7 +318,7 @@ struct
         (* function call to `new' uses expected type to infer the to-be-read result *)
     | typeCheckExp ( vtab, AbSyn.FunApp ("new", args, pos), etp ) =
         ( case expectedBasicType etp of
-            SOME btp => raise Error("in type check new UNIMPLEMENTED, i.e., G-ASSIGNMENT task 3, at ", pos)
+            SOME btp =>
                         (*************************************************************)
                         (*** Suggested implementation STEPS:                       ***)
                         (***    1. type check recursively all `args', denote the   ***)
@@ -337,6 +337,33 @@ struct
                         (***          ("new", (arg_tps, SOME rtp)), new_args, pos  ***)
                         (***        )'                                             ***)
                         (*************************************************************)
+              let
+                (* Create new list of arguments with types attached *)
+                val new_args = map ( fn (e) => typeCheckExp(vtab, e, KnownType (BType Int))) args
+
+                (* Generate a list of types from the new arguments *)
+                val args_tps = map ( fn (e) => typeOfExp(e)) new_args
+
+                (* Check that all types in the list args_tps is BType Int by
+                   comparing and using binary AND operation on the result with
+                   all the other items in the list. *)
+                val tpok = foldl
+                           (fn (e, b) => b andalso (BType Int) = e) true
+                           (args_tps)
+                (* Get the rank of the arguments *)
+                val rank = length args
+
+                (* Calculate return type *)
+                val rtp = Array ( length args, btp )
+              in
+                (* If all is of type BType Int *)
+                if rank > 0 then
+                  if tpok
+                  then
+                    FunApp(("new", (args_tps, SOME rtp)), new_args, pos)
+                  else raise Error ("in type checking call to new, args not int, at ", pos)
+                else raise Error ("in type checking call to new, rank cannot be zero, at ", pos)
+              end
           | NONE     => raise Error("in type check call to new, type inference fails because "^
                                     "of unknown expected basic type, at ", pos) )
 
