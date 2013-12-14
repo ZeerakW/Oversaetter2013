@@ -156,7 +156,7 @@ struct
            | NONE    => raise Error("in type check variable, var "^id^" not in VTab, at ", pos)
         )
 
-    | typeCheckExp( vtab, AbSyn.LValue( AbSyn.Index(id, inds), pos ), _ ) =
+    | typeCheckExp( vtab, AbSyn.LValue( AbSyn.Index(id, inds), pos ), etp ) =
         (* Look up id in symbol table, and extract type *)
         ( case SymTab.lookup id vtab of
             SOME id_tp =>
