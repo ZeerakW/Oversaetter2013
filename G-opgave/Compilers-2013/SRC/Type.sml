@@ -157,6 +157,35 @@ struct
         )
 
     | typeCheckExp( vtab, AbSyn.LValue( AbSyn.Index(id, inds), pos ), _ ) =
+        (* Look up id in symbol table, and extract type *)
+        ( case SymTab.lookup id vtab of
+            SOME tp => 
+                let
+                  (* Create new list of arguments with types attached *)
+                  val new_ids = map ( fn (e) => typeCheckExp(vtab, e, KnownType (BType Int))) inds
+
+                  (* Generate a list of types from the new arguments *)
+                  val ids_tps = map ( fn (e) => typeOfExp(e)) new_ids
+
+                  (* Check that all types in the list args_tps is BType Int by
+                  comparing and using binary AND operation on the result with
+                  all the other items in the list. *)
+                  val tpok = foldl (fn (e, b) => b andalso (BType Int) = e) true
+                                   (ids_tps)
+
+                  (* Get the rank of the indexes *)
+                  val rank = length inds
+                  (**val vrank = *)
+                  (* Calculate return type *)
+                in
+                  (* If all is of type BType Int *)
+                  if tpok
+                  then
+                      LValue(Index((id, tp), new_ids), pos)
+                  else raise Error ("in type checking call to array indexing, args not int, at ", pos)
+                end
+            | NONE    => raise Error("in type check variable, var "^id^" not in VTab, at ", pos)
+        )
         (*************************************************************)
         (*** TO DO: IMPLEMENT for G-ASSIGNMENT, TASK 4             ***)
         (*** Suggested implementation STEPS:                       ***)
@@ -172,7 +201,7 @@ struct
         (***         LValue( Index ((id, id_tp), new_inds), pos )  ***)
         (***       where `new_inds' are the typed version of `inds'***)
         (*************************************************************)
-        raise Error( "in type check, indexed expression UNIMPLEMENTED, at ", pos)
+        (*raise Error( "in type check, indexed expression UNIMPLEMENTED, at ", pos)*)
 
       (* Must be modified to complete task 3 *)
     | typeCheckExp( vtab, AbSyn.Plus (e1, e2, pos), _ ) =

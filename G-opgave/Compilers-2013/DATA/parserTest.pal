@@ -94,12 +94,15 @@ begin
    //write(not read());
    //write(read() or read() and read()); // This one is quite epic (if first case is true, then it imediately returns true without checking the rest [NOT IN INTERPRETER])
    
+   write("\nArray testing\nLength of dim 1 in a (should be 2): ");
    a := new(2,3);
    b := new(2,3,5,6);
+   write(len(0,a));
+   // These two should fail with error from type checker
    //a:=new(); // Rank checking
    //a := new('f',4); // Arguments not int checking
    
    // Unimplemented
-   //a[0] := 1;
+   a[1,1] := 1;
    write("\nDone with testing");   
 end; // Main
