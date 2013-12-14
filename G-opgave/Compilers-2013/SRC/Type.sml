@@ -159,30 +159,38 @@ struct
     | typeCheckExp( vtab, AbSyn.LValue( AbSyn.Index(id, inds), pos ), _ ) =
         (* Look up id in symbol table, and extract type *)
         ( case SymTab.lookup id vtab of
-            SOME tp => 
+            SOME id_tp =>
                 let
-                  (* Create new list of arguments with types attached *)
-                  val new_ids = map ( fn (e) => typeCheckExp(vtab, e, KnownType (BType Int))) inds
+                    (* Check if id_tp is an array, and extract rank in case *)
+                    val (id_rank) = case id_tp of
+                        Array (r,_) => (r)
+                        | tp      => raise Error("in type checking call to array indexing, the variable is not an array, at", pos)
+                  
+                    (* Create new list of arguments with types attached *)
+                    val new_ids = map ( fn (e) => typeCheckExp(vtab, e, KnownType (BType Int))) inds
 
-                  (* Generate a list of types from the new arguments *)
-                  val ids_tps = map ( fn (e) => typeOfExp(e)) new_ids
+                    (* Generate a list of types from the new arguments *)
+                    val ids_tps = map ( fn (e) => typeOfExp(e)) new_ids
 
-                  (* Check that all types in the list args_tps is BType Int by
-                  comparing and using binary AND operation on the result with
-                  all the other items in the list. *)
-                  val tpok = foldl (fn (e, b) => b andalso (BType Int) = e) true
-                                   (ids_tps)
+                    (* Check that all types in the list args_tps is BType Int by
+                    comparing and using binary AND operation on the result with
+                    all the other items in the list. *)
+                    val tpok = foldl (fn (e, b) => b andalso (BType Int) = e) true
+                                     (ids_tps)
 
-                  (* Get the rank of the indexes *)
-                  val rank = length inds
-                  (**val vrank = *)
-                  (* Calculate return type *)
+                    (* Get the rank of the indexes *)
+                    val rank = length inds
                 in
-                  (* If all is of type BType Int *)
-                  if tpok
-                  then
-                      LValue(Index((id, tp), new_ids), pos)
-                  else raise Error ("in type checking call to array indexing, args not int, at ", pos)
+                    (* If all is of type BType Int *)
+                    if tpok then
+                        (* If rank is bigger than zero *)
+                        if rank > 0 then
+                            (* If rank in vtable equals rank given in inds *)
+                            if id_rank = rank then
+                                LValue(Index((id, id_tp), new_ids), pos)
+                            else raise Error ("in type checking call to array indexing, rank is wrong, at", pos)
+                        else raise Error ("in type checking call to array indexing, rank cannot be zero, at ", pos)
+                    else raise Error ("in type checking call to array indexing, args not int, at ", pos)
                 end
             | NONE    => raise Error("in type check variable, var "^id^" not in VTab, at ", pos)
         )
@@ -201,7 +209,6 @@ struct
         (***         LValue( Index ((id, id_tp), new_inds), pos )  ***)
         (***       where `new_inds' are the typed version of `inds'***)
         (*************************************************************)
-        (*raise Error( "in type check, indexed expression UNIMPLEMENTED, at ", pos)*)
 
       (* Must be modified to complete task 3 *)
     | typeCheckExp( vtab, AbSyn.Plus (e1, e2, pos), _ ) =

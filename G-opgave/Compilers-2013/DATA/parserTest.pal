@@ -17,7 +17,7 @@ end;
 
 procedure main()
 // Stating type of variables
-var t : bool ; p : int; i : int; a : array of array of int; b : array of array of array of array of int;
+var t : bool ; p : int; i : int; a : array of array of int; b : array of array of array of array of int;c : array of array of char;
 begin
    write("Starting test of functions (including return)\n");
    if test()=0 and test2(5)=5 then
@@ -103,6 +103,6 @@ begin
    //a := new('f',4); // Arguments not int checking
    
    // Unimplemented
-   a[1,1] := 1;
+   a[1,2] := 1;
    write("\nDone with testing");   
 end; // Main
