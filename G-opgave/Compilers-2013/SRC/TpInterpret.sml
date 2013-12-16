@@ -304,7 +304,8 @@ and callFun ( (rtp : Type option, fid : string, fargs : Dec list, body : StmtBlo
             let val new_vtab = bindTypeIds(fargs, aargs, fid, pdcl, pcall)
                 val res  = execBlock( body, new_vtab, ftab )
             in  ( case (rtp, res) of
-                    (NONE  , _     ) => NONE (* Procedure, hence modify this code for TASK 5. *) 
+                    (NONE  , _     ) => updateOuterVtable vtab new_vtab (aexps, fargs)
+                        (*NONE  Procedure, hence modify this code for TASK 5. *) 
 
                   | (SOME t, SOME r) => if   typesEqual(t, typeOfVal r) 
                                         then SOME r
@@ -321,9 +322,35 @@ and callFun ( (rtp : Type option, fid : string, fargs : Dec list, body : StmtBlo
  * result requires that argument expressions are variable names, i.e. expressions like
  * '2 + x' do not work, since '2 * x' is not an LValue variable name.
  *)
-and updateOuterVtable vtabOuter vtabInner (out_exp, in_arg) = ()
-(* Implement this function to complete TASK 5 in the interpreter. *)
+and updateOuterVtable vtabOuter vtabInner (out_exp, in_arg) =
+let
+   val strlist = map (fn Dec((s,_),(_,_)) => s) in_arg
+   val ind_count  =  (List.tabulate(length strlist, fn x => x))
 
+   val _ = map ( fn (idx) =>
+               let val exp = List.nth(out_exp, idx)
+                   val s   = List.nth(strlist, idx)
+               in
+                  ( case SymTab.lookup s vtabInner of
+                    NONE => raise Error("Error input not understood", (0,0))
+                  | SOME result =>
+                           (*raise Error(s^" := "^pp_exp e, (0,0))*)
+                           ( case exp of
+                              LValue ( Var( id, _), _ ) =>
+                              (
+                               case SymTab.lookup id vtabOuter of
+                                 SOME adr =>
+                                 adr := !result
+                               | NONE => raise Error("DOESNT WORK", (0,0))
+                              )
+                           | _ => raise Error("DOESNT WORK", (0,0))
+                           )
+                  )
+               end
+         ) ind_count
+in
+   NONE
+end
 
 and mkNewArr( btp : BasicType, shpval : Value list, pos : Pos ) : Value =
         let val shape  = map ( fn d => case d of
