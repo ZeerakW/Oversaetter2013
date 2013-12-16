@@ -326,17 +326,17 @@ and updateOuterVtable vtabOuter vtabInner (out_exp, in_arg) =
 let
    val strlist = map (fn Dec((s,_),(_,_)) => s) in_arg
    val ind_count  =  (List.tabulate(length strlist, fn x => x))
-   
-   val _ = map ( fn (idx) => 
+
+   val _ = map ( fn (idx) =>
                let val exp = List.nth(out_exp, idx)
                    val s   = List.nth(strlist, idx)
                in
                   ( case SymTab.lookup s vtabInner of
                     NONE => raise Error("Error input not understood", (0,0))
-                  | SOME result => 
+                  | SOME result =>
                            (*raise Error(s^" := "^pp_exp e, (0,0))*)
                            ( case exp of
-                              LValue ( Var( id, _), _ ) => 
+                              LValue ( Var( id, _), _ ) =>
                               (
                                case SymTab.lookup id vtabOuter of
                                  SOME adr =>
