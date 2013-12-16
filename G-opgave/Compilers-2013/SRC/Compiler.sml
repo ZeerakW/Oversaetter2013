@@ -439,6 +439,86 @@ struct
         raise Error("variable "^"n"^" with empty index, at ", pos)
 
     | compileLVal( vtab : VTab, Index ((n,t),inds) : LVAL, pos : Pos ) =
+        let
+            val place = "_cur_"^newName() (* Current memory location *)
+            val (line,_)= pos (* Extract line for error messages *)
+
+            fun checkInds(res_reg, place, inds) =
+                let
+                    val cond_reg = "_cond_"^newName()
+                    val cond_r   = "_cond_"^newName()
+                    val index    = "_index_"^newName()
+                    val e_reg    = "_tmp_"^newName()
+                    val arr_rank = length inds
+                    val arr = List.tabulate(arr_rank, fn x => x)
+                in
+                    foldl (fn ((arr,i),code) =>
+                        let
+                            val code_e     = compileExp(vtab, i, index)
+                            val code_check = [
+                              Mips.LW(e_reg, place, makeConst (arr*4)),
+                              Mips.SLT(cond_reg, index, "0"),
+                              Mips.XORI(cond_reg, cond_reg, "1"),
+                              Mips.SLT(cond_r, index, e_reg),
+                              Mips.AND(res_reg, cond_r, cond_reg),
+                              Mips.LI("5", makeConst line), (* Error at line *)
+                              Mips.BEQ(res_reg, "0", "_IllegalArrSizeError_")
+                            ]
+                        in
+                          if arr > arr_rank then raise Error("Too many dimensions!", pos) else
+                          code_e @ code_check @ code
+                        end
+                    ) [] (ListPair.zip (arr, inds))
+                end
+                fun computeFlatIndex(res, place, inds) =
+                let
+                    val arr_rank = length inds
+                    val idx  = (List.tabulate(arr_rank, fn x => x))
+                    val e_reg    = "_reg_"^newName()
+                    val tmp    = "_tmp_"^newName()
+                    val stride = "_stride_"^newName()
+                    val code_res_init = [ Mips.ADDI(res, "0", "0") ]
+                    val code_strides = foldl (fn ((i, e),code) =>
+                        let val code_e = compileExp(vtab, e, e_reg)
+                            val code_d = [ Mips.LW  (stride, place,   makeConst ((arr_rank+i)*4)),
+                                           Mips.MUL (tmp, stride, e_reg),
+                                           Mips.ADD (res, res, tmp) ]
+                        in
+                            if (i = arr_rank-1) then
+                                code_e @ [ Mips.ADD (res, "0", e_reg) ] @ code
+                            else
+                                code_e @ code_d @ code
+                        end
+                    ) [] ( ListPair.zip (idx, inds) )
+                in
+                    code_res_init @ code_strides
+                end
+        in ( case SymTab.lookup n vtab of
+            SOME reg => let
+                (* reg has memory location! *)
+                val check    = "_check_"^newName()
+                val res      = "_res_"^newName()
+                val tmp      = "_tmp_"^newName()
+                val code = checkInds(check, reg, inds) @
+                           computeFlatIndex(res, reg, inds)
+            val code = ( case t of
+                Array (_,Int) => code @
+                    [ Mips.LI(tmp, makeConst (length inds)),
+                      Mips.SLL(tmp, tmp, "3"),
+                      Mips.SLL(res, res, "2"), (* Int = 4 bytes *)
+                      Mips.ADD(res, res, tmp),
+                      Mips.ADD(res, res, reg) ]
+                | _ => code @
+                    [ Mips.LI(tmp, makeConst (length inds)),
+                      Mips.SLL(tmp, tmp, "3"),
+                      Mips.ADD(res, res, tmp),
+                      Mips.ADD(res, res, reg) ]
+                )
+            in
+                (code, Mem res)
+            end
+          | NONE => raise Error ("unknown variable "^n^" at, ", pos) )
+        end
         (*************************************************************)
         (*** TODO: IMPLEMENT for G-ASSIGNMENT, TASK 4              ***)
         (*** Sugested implementation STEPS:                        ***)
@@ -462,8 +542,6 @@ struct
         (***     Bonus question: can you implement it without      ***)
         (***                        using the stored strides?      ***)
         (*************************************************************)
-        raise Error( "indexed variables UNIMPLEMENTED, at ", pos)
-
 
   (* instr.s for one statement. exitLabel is end (for control flow jumps) *)
   and compileStmt( vtab, ProcCall (("write",_), [e], pos), _ ) =
