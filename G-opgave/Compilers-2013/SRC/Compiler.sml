@@ -426,9 +426,22 @@ struct
             @ [Mips.MOVE (makeConst reg,t1)] (* store in reg *)
             , maxreg)
       end
+   and rePutArgs [] vtable regs = []
+     | rePutArgs (e::es) vtable (re::regs) =
+      let
+          val s = case e of
+                    LValue ( Var( id, _), _ ) => id
+                    | _ => raise Error("Argument not LValue", (0,0))
+          val x = case SymTab.lookup s vtable of
+                    SOME x => x
+                  | NONE => raise Error("Variable not found in vtable", (0,0))
+          val code = rePutArgs es vtable regs
+          (*val _ = print ("Move code added: MOVE : "^x^" := "^re^"\n")*)
+      in
+          [Mips.MOVE (x, re)] @ code
+      end
 (** TASK 5: You may want to create a function slightly similar to putArgs,
  *  but instead moving args back to registers. **)
-
 
   and compileLVal( vtab : VTab, Var (n,_) : LVAL, pos : Pos ) : Mips.mips list * Location =
         ( case SymTab.lookup n vtab of
@@ -598,9 +611,14 @@ struct
         | ProcCall ((n,_), es, p) => 
           let
               val (mvcode, maxreg) = putArgs es vtable minReg
+              val regs = List.tabulate (maxreg - minReg, (fn reg => makeConst (reg + (minReg))))
+              val rev_code = rePutArgs es vtable regs
           in
-              mvcode @ [Mips.JAL (n, List.tabulate (maxreg, fn reg => makeConst reg))]
+              mvcode
+              @ [Mips.JAL (n, regs)]
+              @ rev_code
           end
+
         | Assign (lv, e, p) =>
           let val (codeL,loc) = compileLVal(vtable, lv, p)
               val t = typeOfExp ( LValue(lv,p) )
@@ -683,12 +701,20 @@ struct
                                      ^")", pos)
           val (movePairs, vtable) = getMovePairs args [] minReg
           val argcode = map (fn (vname, reg) => Mips.MOVE (vname, reg)) movePairs
+          val argcode_rev = map (fn (vname, reg) => Mips.MOVE (reg, vname)) movePairs
+
           (** TASK 5: You need to add code to move variables back into callee registers,
            * i.e. something similar to 'argcode', just the other way round.  Use the
            * value of 'isProc' to determine whether you are dealing with a function
            * or a procedure. **)
           val body = compileStmts block vtable (fname ^ "_exit")
+          val reg_args = map (fn (_,r) => r) movePairs
+
           val (body1, _, maxr, spilled) =  (* call register allocator *)
+            if isProc then
+              RegAlloc.registerAlloc ( argcode @ body @ argcode_rev )
+                                     reg_args minReg maxCaller maxReg 0
+            else
               RegAlloc.registerAlloc ( argcode @ body )
                                      ["2"] minReg maxCaller maxReg 0
                                      (* 2 contains return val*)
