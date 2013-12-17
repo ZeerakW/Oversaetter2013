@@ -1,0 +1,48 @@
+program map;
+
+function f(x : int) : char
+   begin
+   //write(x);
+   return chr(x);
+   end
+;
+
+function map(x : array of array of int) : array of array of char
+var n : int;
+    i : int;
+    y : array of array of char;
+begin
+    i := len(0,x);
+    n := len(1,x);
+    y := new(i,n);
+    while (0 < i) do
+        begin
+            n := len(1,x);
+            while (0 < n) do
+                begin
+                    y[i-1,n-1] := f(x[i-1,n-1]);
+                    n := n - 1;
+                end;
+            i := i - 1;
+        end;
+    return y;
+end;
+
+procedure main()
+   var x : array of array of int;
+       p : array of array of char;
+
+begin
+   write("Using map!");
+   x := new(2,2);
+   x[0,0] := 51;
+   x[0,1] := 43;
+   x[1,0] := 120;
+   x[1,1] := 185;
+   p := map(x);
+   write("\n");
+   write(p[0,0]);
+   write(p[0,1]);
+   write(p[1,0]);
+   write(p[1,1]);
+end; // Main
