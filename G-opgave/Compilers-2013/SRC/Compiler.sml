@@ -708,13 +708,12 @@ struct
            * value of 'isProc' to determine whether you are dealing with a function
            * or a procedure. **)
           val body = compileStmts block vtable (fname ^ "_exit")
+          val reg_args = map (fn (_,r) => r) movePairs
 
           val (body1, _, maxr, spilled) =  (* call register allocator *)
             if isProc then
               RegAlloc.registerAlloc ( argcode @ body @ argcode_rev )
-                                       ["2", "3", "4"] minReg maxCaller maxReg 0
-                 (** TO DO HERE *)
-                 (* Generate list of registers to save dynamically by using args *)
+                                     reg_args minReg maxCaller maxReg 0
             else
               RegAlloc.registerAlloc ( argcode @ body )
                                      ["2"] minReg maxCaller maxReg 0
