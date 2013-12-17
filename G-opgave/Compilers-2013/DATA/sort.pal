@@ -9,7 +9,7 @@ var n : int;
     i : int;
     a : array of int;
 begin
-   n := readInt();
+   n := readI();
    a := readVect(n);
 
    sort( a );
@@ -17,7 +17,7 @@ begin
    printVect( a );
 end;
 
-function readInt() :  int
+function readI() :  int
 begin
    write("\nType an int:");
    return read(); // should read an int, see function type

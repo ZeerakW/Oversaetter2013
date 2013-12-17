@@ -93,7 +93,7 @@ begin
    write ("Enter a natural number, expect 10* your number afterwards: ");
    x := read();
 
-   y := eatregs(x, x, x, x, x, x, x, x, x, x, x, x, x, x, x);
+   y := eatregs(x, x, x, x, x, x, x, x, x, x, x, x, x, x);
    write(y);
    write('\n');
 
@@ -104,16 +104,16 @@ begin
    // this should always yield 0
    write ("Enter any natural number, expect 0 as output afterwards: ");
    y := read();
-   y := eatregs2(x-eatregs2(y, y, y, y, y, y, y, y, y, y, y),
-                 eatregs2(y, y, y, y, y, y, y, y, y, y, y)-x,
-                 x-eatregs2(y, y, y, y, y, y, y, y, y, y, y),
-                 eatregs2(y, y, y, y, y, y, y, y, y, y, y)-x,
-                 x-eatregs2(y, y, y, y, y, y, y, y, y, y, y),
-                 eatregs2(y, y, y, y, y, y, y, y, y, y, y)-x,
-                 x-eatregs2(y, y, y, y, y, y, y, y, y, y, y),
-                 eatregs2(y, y, y, y, y, y, y, y, y, y, y)-x,
-                 x-eatregs2(y, y, y, y, y, y, y, y, y, y, y),
-                 eatregs2(y, y, y, y, y, y, y, y, y, y, y)-x);
+   y := eatregs2(x-eatregs2(y, y, y, y, y, y, y, y, y, y),
+                 eatregs2(y, y, y, y, y, y, y, y, y, y)-x,
+                 x-eatregs2(y, y, y, y, y, y, y, y, y, y),
+                 eatregs2(y, y, y, y, y, y, y, y, y, y)-x,
+                 x-eatregs2(y, y, y, y, y, y, y, y, y, y),
+                 eatregs2(y, y, y, y, y, y, y, y, y, y)-x,
+                 x-eatregs2(y, y, y, y, y, y, y, y, y, y),
+                 eatregs2(y, y, y, y, y, y, y, y, y, y)-x,
+                 x-eatregs2(y, y, y, y, y, y, y, y, y, y),
+                 eatregs2(y, y, y, y, y, y, y, y, y, y)-x);
    write(y);
    write('\n');
 end;

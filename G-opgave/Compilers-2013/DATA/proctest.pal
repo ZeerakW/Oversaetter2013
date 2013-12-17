@@ -1,21 +1,25 @@
 program proctest;
 
-procedure f(a : int; b : array of int)
+procedure f(a : int; b : int; c : int)
 begin
-    a := a + 1;
-    b[0] := b[0] + 1;
+    a := a + 2;
+    b := b + 2;
+    c := c + 2;
+    //write(a+b);
 end;
 
 procedure main()
 var
     x : int;
     y : int;
+    k : int;
     z : array of int;
 begin
    x := 2;
    y := 3;
+   k := 10;
    z := new(1);
    z[0] := 5;
-   f(x, z);
-   write(x); write(' '); write(z);
+   f(x, y, k);
+   write(x); write(' '); write(y); write(' '); write(k);
 end;

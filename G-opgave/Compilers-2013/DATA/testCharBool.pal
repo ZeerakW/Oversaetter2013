@@ -35,8 +35,10 @@ begin
 
     write("Char array is: \n");
     printArr(a);
-    write("Bool array is: \n");
-    printArr(b);
+
+    // printArr does not support boolean arrays (it is not polymorphic!)
+    //write("Bool array is: \n");
+    //printArr(b);
 end;
 
 
