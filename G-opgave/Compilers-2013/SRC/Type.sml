@@ -194,23 +194,7 @@ struct
                 end
             | NONE    => raise Error("in type check variable, var "^id^" not in VTab, at ", pos)
         )
-        (*************************************************************)
-        (*** TO DO: IMPLEMENT for G-ASSIGNMENT, TASK 4             ***)
-        (*** Suggested implementation STEPS:                       ***)
-        (***    1. check that the indexes, `inds', are int exps    ***)
-        (***       ( retorical question: what is the expected type ***)
-        (***         when calling typeOfExp on each index? )       ***)
-        (***    2. check that the type of `id' (the indexed array) ***)
-        (***       is an array type, `id_tp' (via vtab lookup)     ***)
-        (***       AND that the rank of `id_tp' equals the length  ***)
-        (***       of `inds', i.e., full indexing is expected,     ***)
-        (***       AND that the rank > 0                           ***)
-        (***    3. the result expression should be                 ***)
-        (***         LValue( Index ((id, id_tp), new_inds), pos )  ***)
-        (***       where `new_inds' are the typed version of `inds'***)
-        (*************************************************************)
 
-      (* Must be modified to complete task 3 *)
     | typeCheckExp( vtab, AbSyn.Plus (e1, e2, pos), _ ) =
         let val e1_new = typeCheckExp( vtab, e1, KnownType (BType Int) )
             val e2_new = typeCheckExp( vtab, e2, KnownType (BType Int) )
@@ -221,7 +205,6 @@ struct
                              pp_type tp1^" and "^pp_type tp2^" at ", pos)
         end
 
-      (* Must be modified to complete task 3 *)
     | typeCheckExp( vtab, AbSyn.Minus (e1, e2, pos), _ ) =
         let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Int) )
             val e2_new = typeCheckExp(vtab, e2, KnownType (BType Int) )
@@ -232,7 +215,6 @@ struct
                              pp_type tp1^" and "^pp_type tp2^" at ", pos)
         end
 
-    (* Task 2 and 3: Some type-checking of operators should occur here. *)
     | typeCheckExp ( vtab, AbSyn.Times (e1, e2, pos), _ ) =
         let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Int) )
             val e2_new = typeCheckExp(vtab, e2, KnownType (BType Int) )
@@ -253,7 +235,6 @@ struct
                              pp_type tp1^" and "^pp_type tp2^" at ", pos)
         end
 
-      (* Must be modified to complete task 3 *)
     | typeCheckExp ( vtab, AbSyn.Equal(e1, e2, pos), _ ) =
        let val e1_new = typeCheckExp(vtab, e1, UnknownType )
             val tp1 = typeOfExp e1_new
@@ -270,7 +251,6 @@ struct
                              pp_type tp1^" <> "^pp_type tp2^" at ", pos)
         end
 
-      (* Must be modified to complete task 3 *)
     | typeCheckExp ( vtab, AbSyn.Less (e1, e2, pos), _ ) =
         let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Int))
             val e2_new = typeCheckExp(vtab, e2, KnownType (BType Int) )
@@ -286,7 +266,6 @@ struct
                              pp_type tp1^" <> "^pp_type tp2^" at ", pos)
         end
 
-      (* Must be modified to complete task 3 *)
     | typeCheckExp ( vtab, AbSyn.And (e1, e2, pos), _ ) =
         let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Bool) )
             val e2_new = typeCheckExp(vtab, e2, KnownType (BType Bool) )
@@ -297,7 +276,6 @@ struct
                              pp_type tp1^" and "^pp_type tp2^" at ", pos)
         end
 
-    (* Task 2 and 3: Some type-checking of operators should occur here. *)
     | typeCheckExp ( vtab, AbSyn.Or  (e1, e2, pos), _ ) =
         let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Bool) )
             val e2_new = typeCheckExp(vtab, e2, KnownType (BType Bool) )
@@ -355,24 +333,6 @@ struct
     | typeCheckExp ( vtab, AbSyn.FunApp ("new", args, pos), etp ) =
         ( case expectedBasicType etp of
             SOME btp =>
-                        (*************************************************************)
-                        (*** Suggested implementation STEPS:                       ***)
-                        (***    1. type check recursively all `args', denote the   ***)
-                        (***          resulting (typed) arguments `new_args'.      ***)
-                        (***          (hint: the arguments of new should be ints,  ***)
-                        (***             hence expected type is ... ? )            ***)
-                        (***    2. get the types of `new_args' (via typeOfExp),    ***)
-                        (***          denote them `arg_tps'                        ***)
-                        (***    3. check that all `arg_tps' are ints, i.e,BType Int***)
-                        (***    4. type of the result array is                     ***)
-                        (***           `rtp = Array ( length args, btp )'          ***)
-                        (***         and check the rank of the array is > 0        ***)
-                        (***                                                       ***)
-                        (***    5. Result should be smth like                      ***)
-                        (***       `FunApp(                                        ***)
-                        (***          ("new", (arg_tps, SOME rtp)), new_args, pos  ***)
-                        (***        )'                                             ***)
-                        (*************************************************************)
               let
                 (* Create new list of arguments with types attached *)
                 val new_args = map ( fn (e) => typeCheckExp(vtab, e, KnownType (BType Int))) args
