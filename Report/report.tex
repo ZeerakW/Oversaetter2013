@@ -30,7 +30,9 @@
 \section{Introduction}
 In this report we will document the changes we have made to the Paladim language. 
 
-We were given the assignment to implement certain tasks. For this report, we were asked to implement a parser, integer multiplication, division, and boolean operators, type inference and type checking for the \texttt{new} function, type checking and array indexing, and call-by-value-result semantics for procedures in the Paladim compiler.
+We were given the assignment to implement certain tasks. For this report, we were asked to implement a parser, integer multiplication, division, and boolean operators, type inference and type checking for the \texttt{new} function, type checking and array indexing, and call-by-value-result semantics for procedures in the Paladim compiler.\\
+
+We have written our testing section for each sub section in the analysis, so as to add a greater coherence between the implemented tasks and the test of these. All edited code can be found in the appendices.
 
 \section{Background}
 
@@ -68,6 +70,7 @@ All the keywords of the Paladim language is listed in table \ref{tab:keywords}, 
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|}
+\hline
 Terminal & Keyword \\
 \hline
 \textbf{program} & PROGRAM \\
@@ -96,6 +99,7 @@ We also need keywords for the specific types, since we should be able to write t
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|}
+\hline
 Terminal & Keyword \\
 \hline
 \textbf{int} & INT \\
@@ -113,6 +117,7 @@ Next terminals we need to consider is symbols. These are very simple and shown i
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|}
+\hline
 Terminal & Keyword \\
 \hline
 \textbf{;} & SEMICOLON \\
@@ -130,6 +135,7 @@ All arithmetic operators is found in table \ref{tab:arithmetics}.
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|}
+\hline
 Terminal & Keyword \\
 \hline
 \text{+} & PLUS \\
@@ -151,6 +157,7 @@ Parantheses is covered in table \ref{tab:parentheses}. They have been given thei
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|}
+\hline
 Terminal & Keyword \\
 \hline
 \text{(} & LPAR \\
@@ -169,6 +176,7 @@ Finally we have all of the literals, which are supposed to contain both data and
 \begin{table}[!h]
 \centering
 \begin{tabular}{|c|c|c|}
+\hline
 Terminal & Keyword & Type\\
 \hline
 \textbf{ID} & ID & <string*(int*int)>\\
@@ -212,29 +220,49 @@ OptElse & 8 & Non Associative\\
 \subsubsection{Productions}
 Last task for making the compiler is to write down each of the productions. We ran into a few problems with the handed out language, with both the operators between expression $Exp \rightarrow Exp \text{ OP } Exp$ but also $Exp \rightarrow LVal$.
 
-\subsection{Linking parser}
+\subsubsection{Linking parser}
 The last step to create a new parser, is to link the compiler to use the new implementation of the SLR(1) parser, instead of the handed out LL(1) parser. This was done in the file \textit{"Driver.sml"}.
 
-\subsection{Integer multiplication/division}
-The multiplication and division is both fully supported by the parser, next step is to implement the feature in the type checker.
+\subsubsection{Testing Parser}
+We have tested our parser implementation with the included test file \textit{"parserTest.pal"}. This file is testing pretty much all of the different productions used in the language. We got almost all of them to work, but since we haven't implemented some few things in the type checker, we cannot run the program with some of the operations. Or and Not are two examples of this. Instead we denoted that the compiler would say typechecker failure and not parser error, when compiling - since its a typechecker error, it means the parser succesfully parsed the input.
 
-\subsection{Boolean operators}
+\subsection{Integer multiplication/division}
+The multiplication and division is both fully supported by the parser, next step is to implement the feature in the type checker.\\
+
+To implement the feature in the Paladim compiler, we initially edited the \texttt{TpAbsyn.sml} adding \texttt{Times \& Div} types to the \texttt{typeOfExp} function. We then edit \texttt{Type.sml} extending \texttt{typeCheckExp}. We do type check recursively on the expressions on both sides of the multiplication or the division operator, to ensure that both expression types are of type \texttt{INT}.\\
+Then we edited \texttt{TpInterpret.sml} to implement the formula(\ref{slide:interpretation})
+\begin{align}
+Eval_{exp}(Exp, vtable, ftable) =& Exp_1 binop Exp_2\\
+v1 =& Eval_{Exp} (Exp_1, vtable, ftable)\label{formula:v1}\\
+v2 =& Eval_{Exp} (Exp_2, vtable, ftable)\label{formula:v2}
+\end{align}
+then running the function \texttt{evalBinop} on the operator and the results of the recursive calls to \texttt{evalExp} (gained from \ref{formula:v1} and \ref{formula:v2}).\\
+
+Finally we edited the \texttt{Compilers.sml} file, we recursively translate the expressions on each side of the operator and append the code for each translated expression to a list, to which we finally append the corresponding \texttt{MIPS} instruction.
+
+The same has been done for the \texttt{or \& not} operators, correspondingly changing the typecheck from \texttt{INT} to \texttt{BOOL}. Furthermore, seeing as \texttt{not} is a unary operator we have ensured that the check is only done for one expression, rather than two, as with the rest of the operators we were to implement. Finally, we in \texttt{Compiler.sml} we have implemented the translation to machine code for \texttt{or} inspired by the given implementation for \texttt{and}. \texttt{not} is implemented by using the \texttt{xori} instruction from the \texttt{MIPS} library, \texttt{xor-ing 1} on the register containing the value to be negated.
+
+\subsubsection{Boolean operators}
 Boolean operators is now fully supported by the lexer and parser. The next task to implement this feature is to implement the type checking for these operations.
 
-\subsection{Type inteference}
+The \texttt{or} operator is very 
 
-\subsection{Type checking}
+
+\subsubsection{Testing Multiplication, Division, and Boolean Operators}
+
+\subsection{Type inference \& Type Checking}
+\subsubsection{Type Inference}
+\subsubsection{Type checking}
 * To check the type we needed to add support for checking the type of Or and Not in TpAbSyn
 * We also uncommented Or and Not in the TpAbSyn structure
 
 Interpreter:
 It is important to add pretty printing functionality for all new expressions, since the TpInterpreter is using these functions to print the code being interpreted.
-
-\subsection{Array indexing}
+\subsubsection{Testing Type Inference \& Type Checking}
+\subsection{Array Indexing}
+\subsubsection{Testing Array Indexing}
 \subsection{Call-by-value-result semantics}
-
-\section{Testing}
-We have tested our parser implementation with the included test file \textit{"parserTest.pal"}. This file is testing pretty much all of the different productions used in the language. We got almost all of them to work, but since we haven't implemented some few things in the type checker, we cannot run the program with some of the operations. Or and Not are two examples of this. Instead we denoted that the compiler would say typechecker failure and not parser error, when compiling - since its a typechecker error, it means the parser succesfully parsed the input.
+\subsubsection{Testing Call-by-Value-Result semantics}
 
 \section{Conclusion}
 The milestone has been met, according to the assignment specification. The tests clearly indicate this.
@@ -246,6 +274,8 @@ Torben Ægidius Mogensen,
 \emph{Introduction to Compiler Design}.
 Springer London,
 2011.
+
+%\bibitem{slide:interpretation}
 \end{thebibliography}
 
 
