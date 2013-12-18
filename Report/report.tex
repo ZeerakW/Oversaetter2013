@@ -28,30 +28,33 @@
 \newpage
 \tableofcontents
 \section{Introduction}
-In this report we will document the changes we have made to the Paladim language thus far.
+In this report we will document the changes we have made to the Paladim language. 
 
-We were given the assignment to implement certain tasks. For this status report, we were asked to implement a parser for the Paladim language.
-
-The parser was implemented by creating a new grammar file, which has been handed in with this assignment, it can be found in the \texttt{SRC} folder.
+We were given the assignment to implement certain tasks. For this report, we were asked to implement a parser, integer multiplication, division, and boolean operators, type inference and type checking for the \texttt{new} function, type checking and array indexing, and call-by-value-result semantics for procedures in the Paladim compiler.
 
 \section{Background}
 
-% TODO: Not sure what to write here that hasn't already been stated in the introduction. Any suggestions?
+We will briefly introduce the nature of the changes for each of the tasks given. The tasks given were:
+\begin{itemize}
+\item Implement a parser for the Paldim language
+\item Implement integer division and multiplication and boolean operators in the Paladim compiler
+\item Type inference and type checking for the \texttt{new} function
+\item Type checking and code generation for Array Indexing
+\item Call-By-Value-Result semantics for procedures
+\end{itemize}
 
-%\pgfversion
-%%\begin{dot2tex}
-%digraph {
-%  rankdir = LR;
-%  node [shape=circle];
-%  start [color=white, shape=plaintext];
-%  q2 [shape=doublecircle];
-%  start -> q1;
-%  q1 -> q1 [label="a"];
-%  q2 -> q2 [label="a"];
-%  q1 -> q2 [label="b"];
-%  q2 -> q1 [label="b"];
-%}
-%\end{dot2tex}
+% TODO Add parser.grm to appendices label: Appendix:Parser.grm
+The parser was implemented by creating a new grammar file, which can be seen in \ref{Appendix:Parser.grm}. It can also be found in the \texttt{SRC} folder.\\
+
+% TODO Integer Multiplication, division and boolean operation need to be explained
+For the integer multiplication, division and boolean operations; we initially edited the \texttt{TpAbsyn.sml} file to reflect the operations we wished to implement (\texttt{times, divide, or, not}), we then edited Compiler.sml, where we implemented the translation to \texttt{MIPS}, we then edited \texttt{TpInterpret.sml} where we implemented the interpretation, finally we edited \texttt{Type.sml} where we ensure that the types correspond to the desired values.\\ 
+% TODO Type inference and type checking for the new function need to be explained
+For the \texttt{new \& read} functions, we edit \texttt{Type.sml} as we are to implement simple type inference and type checking. This is done in \texttt{typeCheckExp}.
+% TODO Type checking and array indexing need to be explained
+To implement type checking and array indexing for arrays, we edited \texttt{Type.sml} to reflect required changes for array handling. Further, we edited the \texttt{compileLVal} function in \texttt{Compiler.sml} to support translation to machine code.\\
+
+% TODO Call-By-Value-Result semantics for procedures
+To implement Call-By-Value-Result semantics we have edited \texttt{TypeInterpret.sml}, implementing \texttt{updateOuterVtable}. Furthermore we have also extended \texttt{Compiler.sml} to support code generation for Call-By-Value-Result interpretation, by implementing a new function named \texttt{rePutArgs}. 
 
 \section{Analysis}
 \subsection{Parser}
