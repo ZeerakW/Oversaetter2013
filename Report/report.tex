@@ -239,8 +239,15 @@ v2 =& Eval_{Exp} (Exp_2, vtable, ftable)\label{formula:v2}
 then running the function \texttt{evalBinop} on the operator and the results of the recursive calls to \texttt{evalExp} (gained from \ref{formula:v1} and \ref{formula:v2}).\\
 
 Finally we edited the \texttt{Compilers.sml} file, we recursively translate the expressions on each side of the operator and append the code for each translated expression to a list, to which we finally append the corresponding \texttt{MIPS} instruction.
+
+The same has been done for the \texttt{or \& not} operators, correspondingly changing the typecheck from \texttt{INT} to \texttt{BOOL}. Furthermore, seeing as \texttt{not} is a unary operator we have ensured that the check is only done for one expression, rather than two, as with the rest of the operators we were to implement. Finally, we in \texttt{Compiler.sml} we have implemented the translation to machine code for \texttt{or} inspired by the given implementation for \texttt{and}. \texttt{not} is implemented by using the \texttt{xori} instruction from the \texttt{MIPS} library, \texttt{xor-ing 1} on the register containing the value to be negated.
+
 \subsubsection{Boolean operators}
 Boolean operators is now fully supported by the lexer and parser. The next task to implement this feature is to implement the type checking for these operations.
+
+The \texttt{or} operator is very 
+
+
 \subsubsection{Testing Multiplication, Division, and Boolean Operators}
 
 \subsection{Type inference \& Type Checking}
