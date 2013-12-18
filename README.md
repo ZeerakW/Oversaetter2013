@@ -24,6 +24,9 @@ git checkout -b <branchname>
 Normal add, commit workflow:
 
 Finishing off with the branch:
+
 git push origin <branchname>
+
 git checkout master
+
 git branch -D <branchname>
