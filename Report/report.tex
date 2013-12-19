@@ -246,7 +246,12 @@ The same has been done for the \texttt{or \& not} operators, correspondingly cha
 A number of tests was done, to check that the multiply and divide operators, as well as the boolean operators \testtt{or \& not}, are behaving as expected. The tests is available in \texttt{DATA\parserTest.pal}, which both test a lot of parser-related functionality, which includes the testing of the aforementioned operators.\\ This results does not need much explanation, as the expected results are trivial. But running the tests, confirm that the operators behave as desired.
 
 \subsection{Type inference \& Type Checking}
+This section explaines how we chose to implement type inference and type checking, focusing on what was needed to implement these properties into the Paladim compiler.\\
+The implementation for type checking of the \texttt{read}-function, was done in \texttt{Type.sml}. The type checking is done by checking what type expression is passed to the function, and from that determining an expected type of \texttt{read}. If the expression contains a specific operator, it is possible to determine what type, the subexpression are expected to be, and let \texttt{read} inherit this property.\\
+For simplicity, the type checking implemented, only works if it is possible to determine at least the right-hand side of an expression, as implementing all possible cases was not required. This means, that the left-hand subexpression determines the expected type of the right-hand side subexpression. Furthermore, since it there is no unique way of determining the type of an expression like \texttt{read OP read}, there is no implementation to deal with this case, and the type checking will most likely fail.\\
+The function \texttt{new} is also implemented by extending the \texttt{typeCheckExp}-function in \texttt{Type.sml}. The function recursively checks all the arguments of the \texttt{new}-function, by generating a new list of the arguments, and checking that all of these are \texttt{INTs}. Then it checks what \texttt{new} should return, and creates a new array, where the allocation of the element size, is dependent on the return type.
 \subsubsection{Type Inference}
+%Er det nødvendig med de 2 subsections her?
 \subsubsection{Type checking}
 * To check the type we needed to add support for checking the type of Or and Not in TpAbSyn
 * We also uncommented Or and Not in the TpAbSyn structure
