@@ -108,7 +108,7 @@ struct
 
     | compileExp( vtable, StrLit(strlit, pos), place ) =
         let val normalChars =
-                    (List.filter Char.isAlphaNum (String.explode(strlit)))
+                    (List.filter Char.isAlpha (String.explode(strlit)))
                   @ String.explode "__str__"
             val label = String.implode(List.take (normalChars,7)) ^ newName()
             val ()    = stringTable := (label,strlit)::(!stringTable)
