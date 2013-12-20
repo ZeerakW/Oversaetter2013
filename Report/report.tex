@@ -32,7 +32,7 @@ In this report we will document the changes we have made to the Paladim language
 
 We were given the assignment to implement certain tasks. For this report, we were asked to implement a parser, integer multiplication, division, and boolean operators, type inference and type checking for the \texttt{new} function, type checking and array indexing, and call-by-value-result semantics for procedures in the Paladim compiler.
 
-We have written our testing section for each sub section in the analysis, so as to add a greater coherence between the implemented tasks and the test of these. All edited code can be found in the appendices.
+We have written our testing section for each sub section in the analysis, so as to add a greater coherence between the implemented tasks and the test of these. All edited code can be found in the provided code.
 
 \section{Background}
 
@@ -45,20 +45,17 @@ We will briefly introduce the nature of the changes for each of the tasks given.
 \item Call-By-Value-Result semantics for procedures
 \end{itemize}
 
-% TODO Add parser.grm to appendices label: Appendix:Parser.grm
-The parser was implemented by creating a new grammar file, which can be seen in \ref{Appendix:Parser.grm}. It can also be found in the \texttt{SRC} folder.
+The parser was implemented by creating a new grammar file, which can be seen in the \texttt{SRC} folder.
 
-% TODO Integer Multiplication, division and boolean operation need to be explained
 For the integer multiplication, division and boolean operations; we initially edited the \texttt{TpAbsyn.sml} file to reflect the operations we wished to implement (\texttt{times, divide, or, not}), we then edited Compiler.sml, where we implemented the translation to \texttt{MIPS}, we then edited \texttt{TpInterpret.sml} where we implemented the interpretation, finally we edited \texttt{Type.sml} where we ensure that the types correspond to the desired values.
 
-% TODO Type inference and type checking for the new function need to be explained
 For the \texttt{new \& read} functions, we edited \texttt{Type.sml} to implement simple type inference and type checking. This is done in \texttt{typeCheckExp}.
 
-% TODO Type checking and array indexing need to be explained
 To implement type checking and array indexing for arrays, we edited \texttt{Type.sml} to reflect required changes for array handling. Further, we edited the \texttt{compileLVal} function in \texttt{Compiler.sml} to support translation to machine code.
 
-% TODO Call-By-Value-Result semantics for procedures
 To implement Call-By-Value-Result semantics we have edited \texttt{TpInterpret.sml}, implementing \texttt{updateOuterVtable}. Furthermore we have also extended \texttt{Compiler.sml} to support code generation for Call-By-Value-Result interpretation, by implementing a new function named \texttt{rePutArgs}.
+
+Diff files have been provided in \texttt{DIFF} folder of all files edited.
 
 \section{Analysis}
 \subsection{Parser}
@@ -257,7 +254,6 @@ A number of tests was done, to check that the multiply and divide operators, as 
 
 This results does not need much explanation, as the expected results are trivial. But running the tests, confirm that the operators behave as desired.
 
-% TODO I'm working here !! :) - Klaus
 \subsection{Type inference \& Type Checking}
 \subsubsection{Type Inference}
 This section explains how we chose to implement type inference and type checking, focusing on what was needed to implement these properties into the Paladim compiler.
@@ -299,9 +295,9 @@ Furthermore the array header containing the dimension and strides need to be add
 The register to the final location is returned together with all the MIPS code to calculate the location.
 
 \subsubsection*{BONUS: Calculating flat index without strides}
-As stated in the assignment it is possible to calculate the flat index without use of the stored strides. This is because the strides are simply calculated from dimensions. As example the first stride is the all of the dimension except the first one multiplied together, this could easily be calculated in MIPS, instead of loading the stride from the memory, it should calculate the stride and put in a new register.
-%, meaning the dimension of the array should be multiplied with the dimension 
+As stated in the assignment it is possible to calculate the flat index without use of the stored strides. This is because the strides are simply calculated from dimensions. As example the first stride is the all of the dimension except the first one multiplied together, this could easily be calculated in MIPS, instead of loading the stride from the memory, it should calculate the stride and put in a new register. By calculating from last dimension first, we would always have the last "stride" in a specific register. This stride could be used, and recalculated for next dimension. By following this approach the strides could be left out of memory and since we do not have to load each of the strides from memory, it should be more efficient.
 %Bonus: The computation of the flat index into the array’s content can be accomplished in a manner of similar efficiency to the one described in Section 3.2.3, but which uses only the array’s dimension sizes (and not its strides). A bonus will be offered if you present how this may be accomplished and/or if you actually implement it (instead of the suggested solution).
+% YAAY we like bonus ! Is it cake or a new computer? :D
 
 \subsubsection{Testing Array Indexing}
 The array indexing is tested in file \texttt{arrayInd.pal}, we decided to test arrays of both integers and characters. We test both assigning a value to the array, but also reading an value. In addition we tested the cases where the indexing was out of boundaries, and where the indexing is not integers at all (characters). All tests went as expected.
@@ -334,24 +330,23 @@ Our call-by-value-result policy is tested by using the provided test files toget
 All test went as expected, without issues.
 
 \section{Conclusion}
-%The milestone has been met, according to the assignment specification. The tests clearly indicate this.
 The compilers demands has been met, according to the assignment specification. All of the test are being called without unexpected results.
 
 We have successfully implemented parser, type checker, code generator and interpreter of all asked features. All of the tests has been executed with the MARS simulator, to verify the solution is working as stated.
 
-%\section{Bibliography}
-\begin{thebibliography}{9}
-\bibitem{springer2011}
-Torben Ægidius Mogensen,
-\emph{Introduction to Compiler Design}.
-Springer London,
-2011.
-
-%\bibitem{slide:interpretation}
-%Slide
-\end{thebibliography}
-
-%\section*{A }
-%Write here \ldots
+\nocite{springer2011}
+\nocite{slideInterpretation}
+\nocite{slideSyntaxAnalysis}
+\nocite{slideTypeChecking}
+\nocite{slideMachineCodeGeneration}
+\nocite{slideMachineCodeGenerationFunction}
+\nocite{slideRegAlloc}
+\nocite{slideLexicalAnalysis}
+\nocite{MoscowML}
+\nocite{Mars}
+\nocite{mips_regalloc}
+\nocite{computerorg}
+\bibliographystyle{plain}
+\bibliography{report.bib}
 
 \end{document}

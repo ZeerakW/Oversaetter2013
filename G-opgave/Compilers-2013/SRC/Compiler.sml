@@ -427,21 +427,19 @@ struct
             , maxreg)
       end
    and rePutArgs [] vtable regs = []
-     | rePutArgs (e::es) vtable (re::regs) =
+     | rePutArgs (LValue (Var(e, _), _)::es) vtable (re::regs) =
       let
-          val s = case e of
-                    LValue ( Var( id, _), _ ) => id
-                    | _ => raise Error("Argument not LValue", (0,0))
-          val x = case SymTab.lookup s vtable of
-                    SOME x => x
-                  | NONE => raise Error("Variable not found in vtable", (0,0))
+         val st = ( case SymTab.lookup e vtable of
+           SOME x => x
+         | NONE => raise Error("Variable "^e^" not found in vtable", (0,0)))
           val code = rePutArgs es vtable regs
-          (*val _ = print ("Move code added: MOVE : "^x^" := "^re^"\n")*)
       in
-          [Mips.MOVE (x, re)] @ code
+          [Mips.MOVE (st, re)] @ code
       end
-(** TASK 5: You may want to create a function slightly similar to putArgs,
- *  but instead moving args back to registers. **)
+      (* In case of anything else than variable name, we are not interested
+         in updating, since we cannot use the value anyway *)
+     | rePutArgs _ _ _ = []
+
 
   and compileLVal( vtab : VTab, Var (n,_) : LVAL, pos : Pos ) : Mips.mips list * Location =
         ( case SymTab.lookup n vtab of
