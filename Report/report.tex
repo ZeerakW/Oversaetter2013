@@ -30,7 +30,7 @@
 \section{Introduction}
 In this report we will document the changes we have made to the Paladim language. 
 
-We were given the assignment to implement certain tasks. For this report, we were asked to implement a parser, integer multiplication, division, and boolean operators, type inference and type checking for the \texttt{new} function, type checking and array indexing, and call-by-value-result semantics for procedures in the Paladim compiler.\\
+We were given the assignment to implement certain tasks. For this report, we were asked to implement a parser, integer multiplication, division, and boolean operators, type inference and type checking for the \texttt{new} function, type checking and array indexing, and call-by-value-result semantics for procedures in the Paladim compiler.
 
 We have written our testing section for each sub section in the analysis, so as to add a greater coherence between the implemented tasks and the test of these. All edited code can be found in the appendices.
 
@@ -46,19 +46,19 @@ We will briefly introduce the nature of the changes for each of the tasks given.
 \end{itemize}
 
 % TODO Add parser.grm to appendices label: Appendix:Parser.grm
-The parser was implemented by creating a new grammar file, which can be seen in \ref{Appendix:Parser.grm}. It can also be found in the \texttt{SRC} folder.\\
+The parser was implemented by creating a new grammar file, which can be seen in \ref{Appendix:Parser.grm}. It can also be found in the \texttt{SRC} folder.
 
 % TODO Integer Multiplication, division and boolean operation need to be explained
-For the integer multiplication, division and boolean operations; we initially edited the \texttt{TpAbsyn.sml} file to reflect the operations we wished to implement (\texttt{times, divide, or, not}), we then edited Compiler.sml, where we implemented the translation to \texttt{MIPS}, we then edited \texttt{TpInterpret.sml} where we implemented the interpretation, finally we edited \texttt{Type.sml} where we ensure that the types correspond to the desired values.\\ 
+For the integer multiplication, division and boolean operations; we initially edited the \texttt{TpAbsyn.sml} file to reflect the operations we wished to implement (\texttt{times, divide, or, not}), we then edited Compiler.sml, where we implemented the translation to \texttt{MIPS}, we then edited \texttt{TpInterpret.sml} where we implemented the interpretation, finally we edited \texttt{Type.sml} where we ensure that the types correspond to the desired values.
 
 % TODO Type inference and type checking for the new function need to be explained
 For the \texttt{new \& read} functions, we edited \texttt{Type.sml} to implement simple type inference and type checking. This is done in \texttt{typeCheckExp}.
 
 % TODO Type checking and array indexing need to be explained
-To implement type checking and array indexing for arrays, we edited \texttt{Type.sml} to reflect required changes for array handling. Further, we edited the \texttt{compileLVal} function in \texttt{Compiler.sml} to support translation to machine code.\\
+To implement type checking and array indexing for arrays, we edited \texttt{Type.sml} to reflect required changes for array handling. Further, we edited the \texttt{compileLVal} function in \texttt{Compiler.sml} to support translation to machine code.
 
 % TODO Call-By-Value-Result semantics for procedures
-To implement Call-By-Value-Result semantics we have edited \texttt{TpInterpret.sml}, implementing \texttt{updateOuterVtable}. Furthermore we have also extended \texttt{Compiler.sml} to support code generation for Call-By-Value-Result interpretation, by implementing a new function named \texttt{rePutArgs}. 
+To implement Call-By-Value-Result semantics we have edited \texttt{TpInterpret.sml}, implementing \texttt{updateOuterVtable}. Furthermore we have also extended \texttt{Compiler.sml} to support code generation for Call-By-Value-Result interpretation, by implementing a new function named \texttt{rePutArgs}.
 
 \section{Analysis}
 \subsection{Parser}
@@ -92,7 +92,7 @@ Terminal & Keyword \\
 \caption{\label{tab:keywords}Keywords}
 \end{table}
 
-We also need keywords for the specific types, since we should be able to write the following as noted in (\ref{eq:varname_type}). The keyword is written in Table \ref{tab:type_keywords}.
+We also need keywords for the specific types, since we should be able to write the following as noted in (\ref{eq:varname_type}). The keyword is written in table \ref{tab:type_keywords}.
 \begin{align}
 \label{eq:varname_type}
 \text{VariableName} \textbf{ : } \text{Type}. 
@@ -217,10 +217,8 @@ OptElse & 8 & Non Associative\\
 \caption{\label{tab:op_precedence}Operator Precedence}
 \end{table}
 
-%\subsubsection{}
-
 \subsubsection{Productions}
-Last task for making the compiler is to write down each of the productions. We ran into a few problems with the handed out language, with both the operators between expression $Exp \rightarrow Exp \text{ OP } Exp$ but also $Exp \rightarrow LVal$. These issues got solved, by substituting the productions into the production for $Exp$
+Last task for making the compiler is to write down each of the productions. We ran into a few problems with the handed out language, with both the operators between expression $Exp \rightarrow Exp \text{ OP } Exp$ but also $Exp \rightarrow LVal$. These issues got solved, by substituting the productions into the production for $Exp$.
 
 \subsubsection{Linking parser}
 The last step to create a new parser, is to link the compiler to use the new implementation of the SLR(1) parser, instead of the handed out LL(1) parser. This was done in the file \textit{"Driver.sml"}.
@@ -229,31 +227,30 @@ The last step to create a new parser, is to link the compiler to use the new imp
 We have tested our parser implementation with a new test file we have created for the purpose, called \textit{"parserTest.pal"}. This file is testing pretty much all of the different productions used in the language. We got all of them to work like they should. To test the parser while the type checker was not implemented, we simply noted if the Paladim program would fail with \texttt{parser error} or \texttt{type checking error}, if the last was the case, it meant the parser did the job correctly since its a typechecker error, hence the compiler proceeded after parse checking.
 
 \subsection{Integer multiplication/division and boolean operators}
-The multiplication and division is both fully supported by the parser, next task is to implement the features in the type checker.\\
+The multiplication and division is both fully supported by the parser, next task is to implement the features in the type checker.
 
-To implement the features in the Paladim compiler, we initially edited the typed abstract syntax tree, \texttt{TpAbsyn.sml}, by adding \texttt{Times \& Div} types to the \texttt{typeOfExp} function. This function can simply just return the type of first operand, since the type check makes sure both operands are of same type. Another important thing to add in this file is the pretty printing of the expressions, since the Interpreter is using those functions. It is done in a similar matter to \texttt{Plus} and \texttt{Minus}.
+To implement the features in the Paladim compiler, we initially edited the typed abstract syntax tree, \texttt{TpAbsyn.sml}, by adding \texttt{Times \& Div} types to the \texttt{typeOfExp} function. This function should simply just return the type of first operand, since the type check makes sure both operands are of same type. Another important thing to add in this file is the pretty printing of the expressions, since the Interpreter is using the pretty printing functionsto show the code to the user. It is done in a similar matter to the pretty printing of \texttt{Plus} and \texttt{Minus}.
 
-Then we edited the type checker, \texttt{Type.sml}, extending the function \texttt{typeCheckExp}. The two functions is implemented by doing a type check recursively of the expressions on both sides of the multiplication or the division operator. These results is compared with the type \texttt{INT}, to make sure both have correct type, if this is not the case we raise an error.\\
+We then edited the type checker, \texttt{Type.sml}, extending the function \texttt{typeCheckExp}. The two functions is implemented by doing a type check recursively of the expressions on both sides of the multiplication or the division operator. The results is compared with the type \texttt{INT}, to make sure both have correct type, if this is not the case we raise an error.
 
-\subsubsection{Multiplication and division in interpreter}
+The same has been done for the \texttt{OR \& NOT} operators, correspondingly changing the typecheck from \texttt{INT} to \texttt{BOOL}. Furthermore, seeing as \texttt{NOT} is a unary operator we have ensured that the check is only done for one expression, rather than two, as with the rest of the operators we were to implement.
+
+\subsubsection{Multiplication, division and boolean operators in interpreter}
+Since multiplication, division and the boolean operators is now implemented in the type checker, it needs to be implemented in the compiler and the interpreter. Here we cover how we achieved this in the interpreter. The interpreter is implemented in the file \texttt{TpInterpret.sml}, hence we need to add the missing functions in there.
+
+The interpreter can expect to get type checked expression, therefore we can simply just evaluate each operand of the expression, and calculate the result, just like with \texttt{Plus} and \texttt{Minus}. This is very trivial for both, the only thing to note here, is in division we have to use the SML function called div, since we are interested in integer division and not floating point division.
+
+Finally we also need to implement the boolean operators in the interpreter. Since the boolean operator \texttt{AND} is already implemented, we decided to implement \texttt{OR} and \texttt{NOT} in the same style, by having a function to evaluate each of the expression respectively \texttt{evalOR} and \texttt{evalNOT}. These helper functions simply calculate \texttt{OR} and \texttt{NOT} by using the SML functions \texttt{orelse} and \texttt{not}. The interpreter is evaluating each of the operands to the function before calling the helper functions, which means the helper function is simply gonna get one or two arguments respectively.
+% TODO I'm working here !! :) - Klaus
+% TODO, maybe add some lines of code to show proof-of-concept
+
+\subsubsection{Multiplication, division and boolean operators in compiler}
 % TODO Fix
-Then we edited \texttt{TpInterpret.sml} to implement the formula(\ref{slide:interpretation})
-\begin{align}
-Eval_{exp}(Exp, vtable, ftable) =& Exp_1 binop Exp_2\\
-v1 =& Eval_{Exp} (Exp_1, vtable, ftable)\label{formula:v1}\\
-v2 =& Eval_{Exp} (Exp_2, vtable, ftable)\label{formula:v2}
-\end{align}
-then running the function \texttt{evalBinop} on the operator and the results of the recursive calls to \texttt{evalExp} (gained from \ref{formula:v1} and \ref{formula:v2}).\\
+Finally to implement the features in the compiler, we edited the \texttt{Compilers.sml} file. We recursively translate the expressions on each side of the operator and append the code for each translated expression to a list, to which we finally append the corresponding \texttt{MIPS} instruction.
 
-\subsubsection{Multiplication and division in compiler}
+%\subsubsection{Boolean operators}
 % TODO Fix
-Finally we edited the \texttt{Compilers.sml} file, we recursively translate the expressions on each side of the operator and append the code for each translated expression to a list, to which we finally append the corresponding \texttt{MIPS} instruction.
-
-\subsubsection{Boolean operators}
-% TODO Fix
-The same has been done for the \texttt{or \& not} operators, correspondingly changing the typecheck from \texttt{INT} to \texttt{BOOL}. Furthermore, seeing as \texttt{not} is a unary operator we have ensured that the check is only done for one expression, rather than two, as with the rest of the operators we were to implement. Finally, we in \texttt{Compiler.sml} we have implemented the translation to machine code for \texttt{or} inspired by the given implementation for \texttt{and}. \texttt{not} is implemented by using the \texttt{xori} instruction from the \texttt{MIPS} library, \texttt{xor-ing 1} on the register containing the value to be negated.
-
-Boolean operators is now fully supported by the lexer and parser. The next task to implement this feature is to implement the type checking for these operations.
+%Finally, we in \texttt{Compiler.sml} we have implemented the translation to machine code for \texttt{or} inspired by the given implementation for \texttt{and}. \texttt{not} is implemented by using the \texttt{xori} instruction from the \texttt{MIPS} library, \texttt{xor-ing 1} on the register containing the value to be negated.
 
 \subsubsection{Testing Multiplication, Division, and Boolean Operators}
 A number of tests was done, to check that the multiply and divide operators, as well as the boolean operators \texttt{or \& not}, are behaving as expected. The tests is available in \texttt{DATA\\parserTest.pal}, which both test a lot of parser-related functionality, which includes the testing of the aforementioned operators.\\
