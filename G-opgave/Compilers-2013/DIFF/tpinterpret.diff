@@ -1,0 +1,115 @@
+diff --git a/G-opgave/Compilers-2013/SRC/TpInterpret.sml b/G-opgave/Compilers-2013/SRC/TpInterpret.sml
+index 86d1ec3..bcec319 100755
+--- a/G-opgave/Compilers-2013/SRC/TpInterpret.sml
++++ b/G-opgave/Compilers-2013/SRC/TpInterpret.sml
+@@ -118,6 +118,16 @@ fun evalAnd (BVal (Log b1), BVal (Log b2), pos) = BVal (Log (b1 andalso b2))
+         raise Error( "And: argument types do not match. Arg1: " ^
+                       pp_val v1 ^ ", arg2: " ^ pp_val v2, pos )
+ 
++fun evalOr (BVal (Log b1), BVal (Log b2), pos) = BVal (Log (b1 orelse b2))
++  | evalOr (v1, v2, pos) =
++        raise Error( "Or: argument types do not match. Arg1: " ^
++                      pp_val v1 ^ ", arg2: " ^ pp_val v2, pos )
++
++fun evalNot (BVal (Log b1), pos) = BVal (Log (not b1))
++  | evalNot (v1, pos) =
++        raise Error( "Not: argument types do not match. Arg1: " ^
++                      pp_val v1, pos )
++
+ (***********************************************)
+ (*** Getting/Setting an Array Index,         ***)
+ (***   with bounds checking                  ***)
+@@ -294,7 +304,8 @@ and callFun ( (rtp : Type option, fid : string, fargs : Dec list, body : StmtBlo
+             let val new_vtab = bindTypeIds(fargs, aargs, fid, pdcl, pcall)
+                 val res  = execBlock( body, new_vtab, ftab )
+             in  ( case (rtp, res) of
+-                    (NONE  , _     ) => NONE (* Procedure, hence modify this code for TASK 5. *) 
++                    (NONE  , _     ) => updateOuterVtable vtab new_vtab (aexps, fargs)
++                        (*NONE  Procedure, hence modify this code for TASK 5. *) 
+ 
+                   | (SOME t, SOME r) => if   typesEqual(t, typeOfVal r) 
+                                         then SOME r
+@@ -311,9 +322,35 @@ and callFun ( (rtp : Type option, fid : string, fargs : Dec list, body : StmtBlo
+  * result requires that argument expressions are variable names, i.e. expressions like
+  * '2 + x' do not work, since '2 * x' is not an LValue variable name.
+  *)
+-and updateOuterVtable vtabOuter vtabInner (out_exp, in_arg) = ()
+-(* Implement this function to complete TASK 5 in the interpreter. *)
+-
++and updateOuterVtable vtabOuter vtabInner (out_exp, in_arg) =
++let
++   val strlist = map (fn Dec((s,_),(_,_)) => s) in_arg
++   val ind_count  =  (List.tabulate(length strlist, fn x => x))
++
++   val _ = map ( fn (idx) =>
++               let val exp = List.nth(out_exp, idx)
++                   val s   = List.nth(strlist, idx)
++               in
++                  ( case SymTab.lookup s vtabInner of
++                    NONE => raise Error("Error input not understood", (0,0))
++                  | SOME result =>
++                           (*raise Error(s^" := "^pp_exp e, (0,0))*)
++                           ( case exp of
++                              LValue ( Var( id, _), _ ) =>
++                              (
++                               case SymTab.lookup id vtabOuter of
++                                 SOME adr =>
++                                 adr := !result
++                               | NONE => raise Error("DOESNT WORK", (0,0))
++                              )
++                           | _ => raise Error("DOESNT WORK", (0,0))
++                           )
++                  )
++               end
++         ) ind_count
++in
++   NONE
++end
+ 
+ and mkNewArr( btp : BasicType, shpval : Value list, pos : Pos ) : Value =
+         let val shape  = map ( fn d => case d of
+@@ -467,13 +504,16 @@ and evalExp ( Literal(lit,_), vtab, ftab ) = lit
+         in  evalBinop(op -, res1, res2, pos)
+         end
+ 
+-    (* Task 2: Some evaluation of operators should occur here. *)
+-(*
+   | evalExp ( Times(e1, e2, pos), vtab, ftab ) =
+-        raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )
++        let val res1   = evalExp(e1, vtab, ftab)
++            val res2   = evalExp(e2, vtab, ftab)
++        in  evalBinop(op *, res1, res2, pos)
++        end
+   | evalExp ( Div(e1, e2, pos), vtab, ftab ) =
+-        raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )
+-*)
++        let val res1   = evalExp(e1, vtab, ftab)
++            val res2   = evalExp(e2, vtab, ftab)
++        in  evalBinop(op div, res1, res2, pos)
++        end
+ 
+   | evalExp ( Equal(e1, e2, pos), vtab, ftab ) =
+         let val r1 = evalExp(e1, vtab, ftab)
+@@ -491,13 +531,17 @@ and evalExp ( Literal(lit,_), vtab, ftab ) = lit
+ 	in  evalAnd(r1, r2, pos)
+ 	end
+ 
+-    (* Task 2: Some evaluation of operators should occur here. *)
+-(*
+   | evalExp ( Or(e1, e2, pos), vtab, ftab ) =
+-        raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )
++        let val r1 = evalExp(e1, vtab, ftab)
++            val r2 = evalExp(e2, vtab, ftab)
++	     in  evalOr(r1, r2, pos)
++     	  end
++
+   | evalExp ( Not(e1, pos), vtab, ftab ) =
+-        raise Error ( "Task 2 not implemented yet in typed interpreter ", pos )
+-*)
++        let val r1 = evalExp(e1, vtab, ftab)
++	     in  evalNot(r1, pos)
++     	  end
++
+ 
+   (************************************************************************)
+   (** application of regular functions, i.e., defined in the program     **)
