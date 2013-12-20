@@ -1,0 +1,17 @@
+diff --git a/G-opgave/Compilers-2013/SRC/Driver.sml b/G-opgave/Compilers-2013/SRC/Driver.sml
+index 74df3d4..c549f4e 100755
+--- a/G-opgave/Compilers-2013/SRC/Driver.sml
++++ b/G-opgave/Compilers-2013/SRC/Driver.sml
+@@ -51,10 +51,10 @@ struct
+       val lexbuf = createLexerStream (BasicIO.open_in inpath)
+     in
+       let
+-        val pgm = LL1Parser.parse Lexer.Token lexbuf
++        (*val pgm = LL1Parser.parse Lexer.Token lexbuf*)
+         (* COMMENT LINE ABOVE AND UNCOMMENT  *)
+         (* THE LINE BELOW TO USE YOUR PARSER *)
+-        (* val pgm = Parser.Prog Lexer.Token lexbuf *)
++        val pgm = Parser.Prog Lexer.Token lexbuf
+       in case arg of
+         "-ti" => typedInterpret (typeCheck pgm)
+       | "-c"  => compileNormal pgm outpath
