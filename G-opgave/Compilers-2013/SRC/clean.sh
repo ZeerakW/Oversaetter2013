@@ -23,3 +23,4 @@ rm -f Compiler.u*
 rm -f Driver.u*
 rm -f ../BIN/Paladim
 rm -f *~
+rm -f ../DATA/*.asm
