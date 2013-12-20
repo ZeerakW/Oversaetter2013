@@ -8,8 +8,18 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{epstopdf}
-%\usepackage{minted}
 \usepackage{verbments}
+\usepackage{wrapfig}
+\usepackage{color}
+\usepackage{fancyvrb}
+
+\renewcommand{\contentsname}{\section{Table of Contents}}
+%\usepackage[colorlinks=true,linkcolor=black]{hyperref}
+% Fancy code with color commands:
+\DefineVerbatimEnvironment{fancycode}%
+        {Verbatim}{fontsize=\footnotesize,commandchars=\\\{\}}
+\DefineVerbatimEnvironment{code}%
+        {Verbatim}{fontsize=\footnotesize}
 
 \title{A Compiler for the \textbf{Paladim} Language}
 \author{
@@ -25,7 +35,6 @@
 \begin{document}
 \maketitle
 
-\newpage
 \tableofcontents
 \section{Introduction}
 In this report we will document the changes we have made to the Paladim language. 
@@ -250,7 +259,7 @@ The expression \texttt{NOT} is implemented in a similar manner, by using the \te
 Muliplication and division is a bit more simple, they basically just compile each of the operands with \texttt{compileExp}, and then append the \texttt{MIPS} instructions \texttt{MUL} and \texttt{DIV} accordingly.
 
 \subsubsection{Testing Multiplication, Division, and Boolean Operators}
-A number of tests was done, to check that the multiply and divide operators, as well as the boolean operators \texttt{OR \& NOT}, are behaving as expected. The tests is available in \texttt{DATA\textbackslash parserTest.pal}, which both test a lot of parser-related functionality, but also includes testing of the aforementioned operators.
+A number of tests was done, to check that the multiply and divide operators, as well as the boolean operators \texttt{OR \& NOT}, are behaving as expected. The tests is available in \texttt{DATA/parserTest.pal}, which both test a lot of parser-related functionality, but also includes testing of the aforementioned operators.
 
 This results does not need much explanation, as the expected results are trivial. But running the tests, confirm that the operators behave as desired.
 
@@ -272,7 +281,7 @@ read() &= INT
 The function \texttt{new} is also implemented by extending the \texttt{typeCheckExp}-function in \texttt{Type.sml}. The function generate a list of arguments which is type checked. This list is then used to calculate another list containing the types of all arguments. This new list is then recursively compared against the \texttt{INT} type. If all arguments is \texttt{INT} the variable called \texttt{tpok} would be true, otherwise false. Then the rank of the array is calculated and the return type is created. If the rank is bigger than zero, and the variable \texttt{tpok} is true, the function will return the \texttt{FunApp} datatype from \texttt{TpAbSyn.sml}. The arguments to this datatype is the list of arguments calculated in the beginning, since these arguments is also containing the type of the expressions, which is required in the typed abstract syntax tree.
 
 \subsubsection{Testing Type Inference \& Type Checking}
-The testing of type inference and type checking is done in \texttt{DATA\textbackslash parterTest.pal}, line 83-93. The lines are currently commented out, since this specific test file is used to test other features of the compiler. First we test the provided case like in (\ref{eq:read}). All of our test went as expected.
+The testing of type inference and type checking is done in \texttt{DATA/parterTest.pal}, line 83-93. The lines are currently commented out, since this specific test file is used to test other features of the compiler. First we test the provided case like in (\ref{eq:read}). All of our test went as expected.
 
 \begin{align}
 \label{eq:read}
@@ -315,16 +324,16 @@ Our helper function first extracts a list of strings from the list of actual arg
 \subsection{Call-by-value-result in compiler}
 To implement the policy in the compiler, we have to edit the \texttt{compileF} and \texttt{compileStmt} functions in the compiler. First of all in \texttt{compileStmt}, we need to edit the generated \texttt{MIPS} code such that the arguments which are put into register by the function \texttt{putArgs} is moved back again after the procedure terminates. To do this, we have created a similar function to \texttt{putArgs}, called \texttt{rePutArgs}, this new function basically just does the inverse of \texttt{putArgs}. We also had to change the tabulate list to start from minReg instead of zero. This is because the arguments used in the procedures start with the lowest register as minReg. Finally the new functions output should be put after the \texttt{MIPS JAL} instruction.
 
-Our helper function \texttt{rePutArgs} extracts the first expression and corresponding register from the arguments. Then it extract the name of the expression to look it up in the symbol table. The registers value is then moved to the address from the symbol table. The rest of the list is appended by recursively using the same function.
+Our helper function \texttt{rePutArgs} extracts the first expression and corresponding register from the arguments. Then it extract the name of the expression to look it up in the symbol table. The registers value is then moved to the address from the symbol table. The rest of the list is appended by recursively using the same function. If it doesn't get a LValue as argument, it should return the empty list. It could be the case if we for example give a procedure an argument directly without using a variable.
 
 The last place to edit for enabling the policy for procedures is the \texttt{compileF} function. This function is running the register allocator, which in our case has to be modified, since we do not use register two for a return value. Instead the register allocator needs to have all of the used registers in our procedure (the arguments). Furthermore we also needed to add the MIPS code to move the variables back to registers. This second task is achieved by simply using a reverse map of \texttt{argcode}, we have called it \texttt{argcode\_rev}. The first task is achieved by extracting all the registers with map from the movePairs function provided.
 
 \subsubsection{Testing Call-by-Value-Result semantics}
 Our call-by-value-result policy is tested by using the provided test files together with our own test file. The files used for testing are the following.
 \begin{itemize}
-\item{\texttt{DATA\textbackslash procReturnSimul.pal}}
-\item{\texttt{DATA\textbackslash procSwap.pal}}
-\item{\texttt{DATA\textbackslash proctest.pal}}
+\item{\texttt{DATA/procReturnSimul.pal}}
+\item{\texttt{DATA/procSwap.pal}}
+\item{\texttt{DATA/proctest.pal}}
 \end{itemize}
 
 All test went as expected, without issues.
@@ -333,6 +342,8 @@ All test went as expected, without issues.
 The compilers demands has been met, according to the assignment specification. All of the test are being called without unexpected results.
 
 We have successfully implemented parser, type checker, code generator and interpreter of all asked features. All of the tests has been executed with the MARS simulator, to verify the solution is working as stated.
+
+\newpage
 
 \nocite{springer2011}
 \nocite{slideInterpretation}
@@ -344,9 +355,748 @@ We have successfully implemented parser, type checker, code generator and interp
 \nocite{slideLexicalAnalysis}
 \nocite{MoscowML}
 \nocite{Mars}
-\nocite{mips_regalloc}
-\nocite{computerorg}
-\bibliographystyle{plain}
-\bibliography{report.bib}
+\nocite{MipsModule}
+\nocite{PattersonHennessy}
+\bibliographystyle{unsrt}
+\renewcommand{\refname}{\section{References}}
+\bibliography{report}
+
+\newpage
+\appendix
+\section{Source code type checker}
+Only edited code is shown, when code is omitted $\ldots$ is inserted instead.
+\begin{fancycode}[frame=lines,fontsize=\scriptsize,label=\textit{edited code - SRC/Type.sml}]
+...
+ | typeCheckExp( vtab, AbSyn.LValue( AbSyn.Index(id, inds), pos ), etp ) =
+     (* Look up id in symbol table, and extract type *)
+     ( case SymTab.lookup id vtab of
+         SOME id_tp =>
+             let
+                 (* Check if id_tp is an array, and extract rank in case *)
+                 val (id_rank) = case id_tp of
+                     Array (r,_) => (r)
+                     | tp      => raise Error("in type checking call to array indexing, the variable is not an array, at", pos)
+               
+                 (* Create new list of arguments with types attached *)
+                 val new_ids = map ( fn (e) => typeCheckExp(vtab, e, KnownType (BType Int))) inds
+
+                 (* Generate a list of types from the new arguments *)
+                 val ids_tps = map ( fn (e) => typeOfExp(e)) new_ids
+
+                 (* Check that all types in the list args_tps is BType Int by
+                 comparing and using binary AND operation on the result with
+                 all the other items in the list. *)
+                 val tpok = foldl (fn (e, b) => b andalso (BType Int) = e) true
+                                  (ids_tps)
+
+                 (* Get the rank of the indexes *)
+                 val rank = length inds
+             in
+                 (* If all is of type BType Int *)
+                 if tpok then
+                     (* If rank is bigger than zero *)
+                     if rank > 0 then
+                         (* If rank in vtable equals rank given in inds *)
+                         if id_rank = rank then
+                             LValue(Index((id, id_tp), new_ids), pos)
+                         else raise Error ("in type checking call to array indexing, rank is wrong, at", pos)
+                     else raise Error ("in type checking call to array indexing, rank cannot be zero, at ", pos)
+                 else raise Error ("in type checking call to array indexing, args not int, at ", pos)
+             end
+         | NONE    => raise Error("in type check variable, var "^id^" not in VTab, at ", pos)
+     )
+...
+ | typeCheckExp( vtab, AbSyn.Plus (e1, e2, pos), _ ) =
+     let val e1_new = typeCheckExp( vtab, e1, KnownType (BType Int) )
+         val e2_new = typeCheckExp( vtab, e2, KnownType (BType Int) )
+         val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+     in  if  typesEqual(BType Int, tp1) andalso typesEqual(BType Int, tp2)
+         then Plus(e1_new, e2_new, pos)
+         else raise Error("in type check plus exp, one argument is not of int type "^
+                          pp_type tp1^" and "^pp_type tp2^" at ", pos)
+     end
+
+ | typeCheckExp( vtab, AbSyn.Minus (e1, e2, pos), _ ) =
+     let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Int) )
+         val e2_new = typeCheckExp(vtab, e2, KnownType (BType Int) )
+         val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+     in  if  typesEqual(BType Int, tp1) andalso typesEqual(BType Int, tp2)
+         then Minus(e1_new, e2_new, pos)
+         else raise Error("in type check minus exp, one argument is not of int type "^
+                          pp_type tp1^" and "^pp_type tp2^" at ", pos)
+     end
+
+ | typeCheckExp ( vtab, AbSyn.Times (e1, e2, pos), _ ) =
+     let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Int) )
+         val e2_new = typeCheckExp(vtab, e2, KnownType (BType Int) )
+         val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+     in if  typesEqual(BType Int, tp1) andalso typesEqual(BType Int, tp2)
+        then Times(e1_new, e2_new, pos)
+        else raise Error("in type check times exp, one argument is not of int type "^
+                          pp_type tp1^" and "^pp_type tp2^" at ", pos)
+     end
+
+ | typeCheckExp ( vtab, AbSyn.Div   (e1, e2, pos), _ ) =
+     let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Int) )
+         val e2_new = typeCheckExp(vtab, e2, KnownType (BType Int) )
+         val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+     in if  typesEqual(BType Int, tp1) andalso typesEqual(BType Int, tp2)
+        then Div(e1_new, e2_new, pos)
+        else raise Error("in type check div exp, one argument is not of int type "^
+                          pp_type tp1^" and "^pp_type tp2^" at ", pos)
+     end
+
+ | typeCheckExp ( vtab, AbSyn.Equal(e1, e2, pos), _ ) =
+    let val e1_new = typeCheckExp(vtab, e1, UnknownType )
+         val tp1 = typeOfExp e1_new
+         val e2_new = typeCheckExp(vtab, e2, KnownType (tp1) )
+         val tp2 = typeOfExp e2_new
+         (* check that tp1 is not an array type *)
+         val () = case tp1 of
+                    Array _ => raise Error("in type check equal, first expression "^pp_exp e1_new^
+                                           "is an array (of type) "^pp_type tp1^" at ", pos)
+                  | _ => ()
+     in  if  typesEqual(tp1, tp2)
+         then Equal(e1_new, e2_new, pos)
+         else raise Error("in type check equal exp, argument types do not match "^
+                          pp_type tp1^" <> "^pp_type tp2^" at ", pos)
+     end
+
+ | typeCheckExp ( vtab, AbSyn.Less (e1, e2, pos), _ ) =
+     let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Int))
+         val e2_new = typeCheckExp(vtab, e2, KnownType (BType Int) )
+         val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+         (* check that tp1 is not an array type *)
+         val () = case tp1 of
+                    Array _ => raise Error("in type check less, first expression "^pp_exp e1_new^
+                                           "is an array (of type) "^pp_type tp1^" at ", pos)
+                  | _ => ()
+     in  if  typesEqual(tp1, tp2)
+         then Less(e1_new, e2_new, pos)
+         else raise Error("in type check less exp, argument types do not match "^
+                          pp_type tp1^" <> "^pp_type tp2^" at ", pos)
+     end
+
+ | typeCheckExp ( vtab, AbSyn.And (e1, e2, pos), _ ) =
+     let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Bool) )
+         val e2_new = typeCheckExp(vtab, e2, KnownType (BType Bool) )
+         val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+     in  if  typesEqual(BType Bool, tp1) andalso typesEqual(BType Bool, tp2)
+         then And(e1_new, e2_new, pos)
+         else raise Error("in type check and exp, one argument is not of bool type "^
+                          pp_type tp1^" and "^pp_type tp2^" at ", pos)
+     end
+
+ | typeCheckExp ( vtab, AbSyn.Or  (e1, e2, pos), _ ) =
+     let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Bool) )
+         val e2_new = typeCheckExp(vtab, e2, KnownType (BType Bool) )
+         val (tp1, tp2) = (typeOfExp e1_new, typeOfExp e2_new)
+     in
+         if typesEqual(BType Bool, tp1) andalso typesEqual(BType Bool, tp2)
+         then Or(e1_new, e2_new, pos)
+         else raise Error("in type check or exp, one argument is not of bool type "^
+                           pp_type tp1^" or "^pp_type tp2^" at ", pos)
+     end
+
+ | typeCheckExp ( vtab, AbSyn.Not (e1,    pos), _ ) =
+     let val e1_new = typeCheckExp(vtab, e1, KnownType (BType Bool) )
+         val tp1 = typeOfExp e1_new
+     in  if  typesEqual(BType Bool, tp1)
+         then Not(e1_new, pos)
+         else raise Error("in type check not exp, one argument is not of bool type "^
+                           pp_type tp1^" at ", pos)
+     end
+...
+ (* function call to `new' uses expected type to infer the to-be-read result *)
+ | typeCheckExp ( vtab, AbSyn.FunApp ("new", args, pos), etp ) =
+     ( case expectedBasicType etp of
+         SOME btp =>
+           let
+             (* Create new list of arguments with types attached *)
+             val new_args = map ( fn (e) => typeCheckExp(vtab, e, KnownType (BType Int))) args
+
+             (* Generate a list of types from the new arguments *)
+             val args_tps = map ( fn (e) => typeOfExp(e)) new_args
+
+             (* Check that all types in the list args_tps is BType Int by
+                comparing and using binary AND operation on the result with
+                all the other items in the list. *)
+             val tpok = foldl
+                        (fn (e, b) => b andalso (BType Int) = e) true
+                        (args_tps)
+             (* Get the rank of the arguments *)
+             val rank = length args
+
+             (* Calculate return type *)
+             val rtp = Array ( length args, btp )
+           in
+             (* If all is of type BType Int *)
+             if rank > 0 then
+               if tpok
+               then
+                 FunApp(("new", (args_tps, SOME rtp)), new_args, pos)
+               else raise Error ("in type checking call to new, args not int, at ", pos)
+             else raise Error ("in type checking call to new, rank cannot be zero, at ", pos)
+           end
+       | NONE     => raise Error("in type check call to new, type inference fails because "^
+                                 "of unknown expected basic type, at ", pos) )
+...
+\end{fancycode}
+
+\section{Source code compiler}
+Only edited code is shown, when code is omitted $\ldots$ is inserted instead.
+\begin{fancycode}[frame=lines,fontsize=\scriptsize,label=\textit{edited code - SRC/Compiler.sml}]
+...
+    | compileExp( vtable, Times(e1, e2, pos), place ) =
+        let val t1 = "times1_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+            val t2 = "times2_" ^ newName()
+            val c2 = compileExp(vtable, e2, t2)
+        in c1 @ c2 @ [Mips.MUL (place,t1,t2)]
+        end
+    | compileExp( vtable, Div(e1, e2, pos), place ) =
+        let val t1 = "div1_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+            val t2 = "div2_" ^ newName()
+            val c2 = compileExp(vtable, e2, t2)
+        in c1 @ c2 @ [Mips.DIV(place,t1,t2)]
+        end
+...
+    | compileExp( vtable, Or(e1, e2, pos), place ) =
+        let val t1 = "or1_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+            val t2 = "or2_" ^ newName()
+            val c2 = compileExp(vtable, e2, t2)
+            val lO = "_or_" ^ newName()
+        in c1 (* do first part, skip 2nd part if already true *)
+           @ [Mips.MOVE (place, t1), Mips.BNE (place, "0", lO) ]
+           @ c2 (* when here, t1 was false, so the result is t2 *)
+           @ [Mips.MOVE (place, t2), Mips.LABEL lO ]
+        end
+
+    | compileExp( vtable, Not(e1, pos), place ) =
+        let val t1 = "not1_" ^ newName()
+            val c1 = compileExp(vtable, e1, t1)
+        in c1 @ [ Mips.XORI (place, t1, "1") ]
+        end
+
+   and rePutArgs [] vtable regs = []
+     | rePutArgs (LValue (Var(e, _), _)::es) vtable (re::regs) =
+      let
+         val st = ( case SymTab.lookup e vtable of
+           SOME x => x
+         | NONE => raise Error("Variable "^e^" not found in vtable", (0,0)))
+          val code = rePutArgs es vtable regs
+      in
+          [Mips.MOVE (st, re)] @ code
+      end
+      (* In case of anything else than variable name, we are not interested
+         in updating, since we cannot use the value anyway *)
+     | rePutArgs _ _ _ = []
+...
+    | compileLVal( vtab : VTab, Index ((n,t),inds) : LVAL, pos : Pos ) =
+        let
+            val place = "_cur_"^newName() (* Current memory location *)
+            val (line,_)= pos (* Extract line for error messages *)
+
+            fun checkInds(res_reg, place, inds) =
+                let
+                    val cond_reg = "_cond_"^newName()
+                    val cond_r   = "_cond_"^newName()
+                    val index    = "_index_"^newName()
+                    val e_reg    = "_tmp_"^newName()
+                    val arr_rank = length inds
+                    val arr = List.tabulate(arr_rank, fn x => x)
+                in
+                    foldl (fn ((arr,i),code) =>
+                        let
+                            val code_e     = compileExp(vtab, i, index)
+                            val code_check = [
+                              Mips.LW(e_reg, place, makeConst (arr*4)),
+                              Mips.SLT(cond_reg, index, "0"),
+                              Mips.XORI(cond_reg, cond_reg, "1"),
+                              Mips.SLT(cond_r, index, e_reg),
+                              Mips.AND(res_reg, cond_r, cond_reg),
+                              Mips.LI("5", makeConst line), (* Error at line *)
+                              Mips.BEQ(res_reg, "0", "_IllegalArrSizeError_")
+                            ]
+                        in
+                          if arr > arr_rank then raise Error("Too many dimensions!", pos) else
+                          code_e @ code_check @ code
+                        end
+                    ) [] (ListPair.zip (arr, inds))
+                end
+                fun computeFlatIndex(res, place, inds) =
+                let
+                    val arr_rank = length inds
+                    val idx  = (List.tabulate(arr_rank, fn x => x))
+                    val e_reg    = "_reg_"^newName()
+                    val tmp    = "_tmp_"^newName()
+                    val stride = "_stride_"^newName()
+                    val code_res_init = [ Mips.ADDI(res, "0", "0") ]
+                    val code_strides = foldl (fn ((i, e),code) =>
+                        let val code_e = compileExp(vtab, e, e_reg)
+                            val code_d = [ Mips.LW  (stride, place,   makeConst ((arr_rank+i)*4)),
+                                           Mips.MUL (tmp, stride, e_reg),
+                                           Mips.ADD (res, res, tmp) ]
+                        in
+                            if (i = arr_rank-1) then
+                                code_e @ [ Mips.ADD (res, "0", e_reg) ] @ code
+                            else
+                                code_e @ code_d @ code
+                        end
+                    ) [] ( ListPair.zip (idx, inds) )
+                in
+                    code_res_init @ code_strides
+                end
+        in ( case SymTab.lookup n vtab of
+            SOME reg => let
+                (* reg has memory location! *)
+                val check    = "_check_"^newName()
+                val res      = "_res_"^newName()
+                val tmp      = "_tmp_"^newName()
+                val code = checkInds(check, reg, inds) @
+                           computeFlatIndex(res, reg, inds)
+            val code = ( case t of
+                Array (_,Int) => code @
+                    [ Mips.LI(tmp, makeConst (length inds)),
+                      Mips.SLL(tmp, tmp, "3"),
+                      Mips.SLL(res, res, "2"), (* Int = 4 bytes *)
+                      Mips.ADD(res, res, tmp),
+                      Mips.ADD(res, res, reg) ]
+                | _ => code @
+                    [ Mips.LI(tmp, makeConst (length inds)),
+                      Mips.SLL(tmp, tmp, "3"),
+                      Mips.ADD(res, res, tmp),
+                      Mips.ADD(res, res, reg) ]
+                )
+            in
+                (code, Mem res)
+            end
+          | NONE => raise Error ("unknown variable "^n^" at, ", pos) )
+        end
+...
+        | ProcCall ((n,_), es, p) => 
+          let
+              val (mvcode, maxreg) = putArgs es vtable minReg
+              val regs = List.tabulate (maxreg - minReg, (fn reg => makeConst (reg + (minReg))))
+              val rev_code = rePutArgs es vtable regs
+          in
+              mvcode
+              @ [Mips.JAL (n, regs)]
+              @ rev_code
+          end
+...
+  and compileF (isProc, fname, args, block, pos) =
+      (* at this point, we do not care about the return type (or no return) *)
+      let (* make a vtable from bound formal parameters,
+               then evaluate expression in this context, return it *)
+          (* arguments passed in registers, "move" into local vars.
+             Code generator imposes max. 13 arguments (maxCaller-minReg)
+           *)
+          val () = if length args <= maxCaller - minReg + 1 then ()
+                   else raise Error (fname ^ ": too many arguments (max "
+                                     ^ makestring (maxCaller - minReg + 1)
+                                     ^")", pos)
+          val (movePairs, vtable) = getMovePairs args [] minReg
+          val argcode = map (fn (vname, reg) => Mips.MOVE (vname, reg)) movePairs
+          val argcode_rev = map (fn (vname, reg) => Mips.MOVE (reg, vname)) movePairs
+
+          val body = compileStmts block vtable (fname ^ "_exit")
+          val reg_args = map (fn (_,r) => r) movePairs
+
+          val (body1, _, maxr, spilled) =  (* call register allocator *)
+            if isProc then
+              RegAlloc.registerAlloc ( argcode @ body @ argcode_rev )
+                                     reg_args minReg maxCaller maxReg 0
+            else
+              RegAlloc.registerAlloc ( argcode @ body )
+                                     ["2"] minReg maxCaller maxReg 0
+                                     (* 2 contains return val*)
+          val (savecode, restorecode, offset) = (* save/restore callee-saves *)
+              stackSave (maxCaller+1) maxr [] [] (4*spilled)
+        in  [Mips.COMMENT ("Function " ^ fname),
+             Mips.LABEL fname,       (* function label *)
+             Mips.SW (RA, SP, "-4"), (* save return address *)
+             Mips.ADDI (SP,SP,makeConst (~4-offset))] (* move SP "up" *)
+          @ savecode                 (* save callee-saves registers *)
+          @ body1                    (* code for function body *)
+          @ [Mips.LABEL (fname^"_exit")] (* exit label *)
+          @ restorecode              (* restore callee-saves registers *)
+          @ [Mips.ADDI (SP,SP,makeConst (4+offset))] (* move SP "down" *)
+          @ [Mips.LW (RA, SP, "-4"),  (* restore return addr *)
+             Mips.JR (RA, [])]       (* return *)
+        end
+...
+\end{fancycode}
+
+\section{Source code driver}
+Only edited code is shown, when code is omitted $\ldots$ is inserted instead. This change gets the compiler to use the new parser.
+\begin{fancycode}[frame=lines,fontsize=\scriptsize,label=\textit{edited code - SRC/Driver.sml - }]
+...
+   let
+     (*val pgm = LL1Parser.parse Lexer.Token lexbuf*)
+     (* COMMENT LINE ABOVE AND UNCOMMENT  *)
+     (* THE LINE BELOW TO USE YOUR PARSER *)
+     val pgm = Parser.Prog Lexer.Token lexbuf
+   in case arg of
+...
+\end{fancycode}
+
+\section{Source code parser}
+Only edited code is shown, when code is omitted $\ldots$ is inserted instead.
+\begin{fancycode}[frame=lines,fontsize=\scriptsize,label=\textit{edited code - SRC/Parser.grm - }]
+/** Tokens **/
+
+/* Literals */
+%token <string*(int*int)> ID           /* Type, position(line, char position) */
+%token <int*(int*int)> NUMLIT          /* Type, position (line,char position) */
+%token <bool*(int*int)> LOGLIT         /* Type, position (line,char position) */
+%token <char*(int*int)> CHALIT         /* Type, position (line,char position) */
+%token <string*(int*int)> STRLIT       /* Type, position (line,char position) */
+
+/* Keywords */
+%token <(int*int)> PROGRAM FUNCTION PROCEDURE VAR BEGIN END IF THEN ELSE
+%token <(int*int)> WHILE DO RETURN
+
+/* Type Keywords */
+%token <(int*int)> INT CHAR BOOL ARRAY OF
+
+/* Symbols */
+%token <(int*int)> SEMICOLON COLON COMMA ASSIGN EOF  /* ASSIGN = ':=' */
+
+/* Arithmetic */
+%token <(int*int)> PLUS MINUS TIMES DIVIDE EQUAL LESS AND OR NOT
+
+/* Parantheses */
+%token <(int*int)> LPAR RPAR RCBR LCBR LBRA RBRA  /* RCBR = Right Curly Brace, ... */
+
+/* VARIOUS - Dont know if they are neccessary! */
+%token <(int*int)> TRUE FALSE
+
+%start Prog
+
+/* Lowest precedence in top */
+%nonassoc OptElse
+%nonassoc ELSE
+%left OR
+%left AND
+%left NOT
+%left EQUAL LESS
+%left PLUS MINUS
+%left TIMES DIVIDE
+//%left       /* Left associative */ 
+//%nonassoc   /* Non associative*/
+/** Highest precedence in bottom */
+
+/** Types **/
+%type <AbSyn.FunDec list> Prog
+%type <AbSyn.FunDec list> FunDecs
+%type <AbSyn.FunDec> FunDec
+%type <AbSyn.StmtBlock> Block
+%type <AbSyn.Stmt list> SBlock
+%type <AbSyn.Stmt list> StmtSeq
+%type <AbSyn.Stmt> Stmt
+%type <AbSyn.Exp option> Ret
+%type <AbSyn.Exp> Exp
+%type <AbSyn.Dec list> PDecl
+%type <AbSyn.Dec list> Params
+%type <AbSyn.Dec> Dec
+%type <AbSyn.Dec list> Decs
+%type <AbSyn.Type> Type
+%type <AbSyn.Exp list> CallParams
+%type <AbSyn.Exp list> Exps
+
+%%
+
+/* Rules  */
+/* Program structure */
+Prog : PROGRAM ID SEMICOLON FunDecs EOF     { $4 }
+;
+
+FunDecs : FunDecs FunDec                    { $1 @ [$2] }
+        | FunDec                            { [$1] }
+;
+
+FunDec : FUNCTION ID LPAR PDecl RPAR COLON Type Block SEMICOLON { AbSyn.Func ($7, #1 $2, $4, $8, $1) }
+                                                                /* Type, Identifier, PDecl, Block, func pos */
+       | PROCEDURE ID  LPAR PDecl RPAR Block SEMICOLON          { AbSyn.Proc (#1 $2, $4, $6, $1) }
+                                                                /* Identifier, PDecl, Block, proc pos */
+;
+
+Block : VAR Decs SBlock                      { AbSyn.Block ($2, $3) }
+      | SBlock                               { AbSyn.Block ([], $1) }
+;
+
+SBlock : BEGIN StmtSeq SEMICOLON END        { $2 }
+       | Stmt                               { [$1] }
+;
+
+StmtSeq : StmtSeq SEMICOLON Stmt            { $1 @ [$3] }
+        | Stmt                              { [$1] }
+;
+
+/* Statements */
+Stmt : ID LPAR CallParams RPAR              { AbSyn.ProcCall (#1 $1, $3, #2 $1) }
+     | IF Exp THEN Block ELSE Block         { AbSyn.IfThEl($2, $4, $6, $1) }
+     | IF Exp THEN Block %prec OptElse      { AbSyn.IfThEl($2, $4, AbSyn.Block([],[]), $1) }
+     | WHILE Exp DO Block                   { AbSyn.While($2, $4, $1) }
+     | RETURN Ret                           { AbSyn.Return($2, $1) }
+     | ID ASSIGN Exp                        { AbSyn.Assign(AbSyn.Var(#1 $1), $3, #2 $1)}
+     | ID LBRA Exps RBRA ASSIGN Exp         { AbSyn.Assign(AbSyn.Index(#1 $1, $3), $6, #2 $1)}
+;
+
+Ret : Exp                                   { SOME $1 }
+    |                                       { NONE }
+;
+
+Exp : NUMLIT                                { AbSyn.Literal (AbSyn.BVal (AbSyn.Num (#1 $1)) , #2 $1) }
+    | LOGLIT                                { AbSyn.Literal (AbSyn.BVal (AbSyn.Log (#1 $1)) , #2 $1) }
+    | CHALIT                                { AbSyn.Literal (AbSyn.BVal (AbSyn.Chr (#1 $1)) , #2 $1) }
+    | STRLIT                                { AbSyn.StrLit $1 }
+    | LCBR Exps RCBR                        { AbSyn.ArrLit ($2, $1) }
+    | ID                                    { AbSyn.LValue(AbSyn.Var (#1 $1),#2 $1)}
+    | ID LBRA Exps RBRA                     { AbSyn.LValue(AbSyn.Index (#1 $1, $3), #2 $1)}
+    | NOT Exp                               { AbSyn.Not ($2, $1) }
+    | LPAR Exp RPAR                         { $2}
+    | ID LPAR CallParams RPAR               { AbSyn.FunApp (#1 $1, $3, #2 $1) }
+    | Exp PLUS Exp                          { AbSyn.Plus ($1, $3, $2) }
+    | Exp MINUS Exp                         { AbSyn.Minus ($1, $3, $2) }
+    | Exp TIMES Exp                         { AbSyn.Times($1, $3, $2) }
+    | Exp DIVIDE Exp                        { AbSyn.Div($1, $3, $2) }
+    | Exp EQUAL Exp                         { AbSyn.Equal($1, $3, $2) }
+    | Exp LESS Exp                          { AbSyn.Less($1, $3, $2) }
+    | Exp AND Exp                           { AbSyn.And($1, $3, $2) }
+    | Exp OR Exp                            { AbSyn.Or($1, $3, $2) }
+;
+
+/* Variable and Parameter, Declarations, Types */
+PDecl : Params                              { $1 }
+      |                                     { [] }
+;
+
+Params : Params SEMICOLON Dec               { $1 @ [$3] }
+       | Dec                                { [$1] }
+;
+
+Dec : ID COLON Type                         { AbSyn.Dec(#1 $1, $3, #2 $1) }
+;
+
+Decs : Decs Dec SEMICOLON                   { $1 @ [$2] }
+     | Dec SEMICOLON                        { [$1] }
+;
+
+Type : INT                                  {AbSyn.Int $1}
+     | CHAR                                 {AbSyn.Char $1}
+     | BOOL                                 {AbSyn.Bool $1}
+     | ARRAY OF Type                        {AbSyn.Array ($3,$1) }
+;
+
+/* Function and Procedure Parameters and Index Lists */
+CallParams : Exps                           { $1 }
+           |                                { [] }
+;
+
+Exps : Exp COMMA Exps                       { $1 :: $3 }
+     | Exp                                  { [$1] }
+;
+
+/* Trailer*/
+\end{fancycode}
+
+\section{Source code lexer}
+Only edited code is shown, when code is omitted $\ldots$ is inserted instead. Only changes here is to use the new parser.
+\begin{fancycode}[frame=lines,fontsize=\scriptsize,label=\textit{edited code - SRC/Lexer.lex - }]
+...
+fun keyword (s, pos) =
+     case s of
+         "program"      => Parser.PROGRAM    pos
+       | "function"     => Parser.FUNCTION   pos
+       | "procedure"    => Parser.PROCEDURE  pos
+       | "var"          => Parser.VAR        pos
+       | "begin"        => Parser.BEGIN      pos
+       | "end"          => Parser.END        pos
+       | "if"           => Parser.IF         pos
+       | "then"         => Parser.THEN       pos
+       | "else"         => Parser.ELSE       pos
+       | "while"        => Parser.WHILE      pos
+       | "do"           => Parser.DO         pos
+       | "return"       => Parser.RETURN     pos
+       | "array"        => Parser.ARRAY      pos
+       | "of"           => Parser.OF         pos
+       | "int"          => Parser.INT        pos
+       | "bool"         => Parser.BOOL       pos
+       | "char"         => Parser.CHAR       pos
+       | "and"          => Parser.AND        pos
+       | "or"           => Parser.OR         pos
+       | "not"          => Parser.NOT        pos
+       | "true"         => Parser.LOGLIT     (true, pos)
+       | "false"        => Parser.LOGLIT     (false, pos)
+       (* Else it must be a identifier *)
+       | _              => Parser.ID         (s, pos)
+
+   (* "lex" will later be the generated function "Token" *)
+   fun repeat lex b
+              = let val res = lex b
+                in case res of
+                         Parser.EOF _ => []
+                       | other => other :: repeat lex b
+                end
+...
+rule Token = parse
+...
+  | [`0`-`9`]+          { case Int.fromString (getLexeme lexbuf) of
+                               NONE   => lexerError lexbuf "Bad integer"
+                             | SOME i => Parser.NUMLIT (i, getPos lexbuf) }
+  | `'` ([` ` `!` `#`-`&` `(`-`[` `]`-`~`] | `\`[` `-`~`]) `'`
+                        { Parser.CHALIT
+                            ((case String.fromCString (getLexeme lexbuf) of
+                               NONE => lexerError lexbuf "Bad char constant"
+                             | SOME s => String.sub(s,1)),
+                             getPos lexbuf) }
+
+  | `"` ([` ` `!` `#`-`&` `(`-`[` `]`-`~`] | `\`[` `-`~`])* `"`
+                        { Parser.STRLIT
+                            ((case String.fromCString (getLexeme lexbuf) of
+                               NONE => lexerError lexbuf "Bad string constant"
+                             | SOME s => String.substring(s,1,
+                                                          String.size s - 2)),
+                             getPos lexbuf) }
+...
+  | ":="                { Parser.ASSIGN    (getPos lexbuf) }
+  | `+`                 { Parser.PLUS      (getPos lexbuf) }
+  | `-`                 { Parser.MINUS     (getPos lexbuf) }
+  | `*`                 { Parser.TIMES     (getPos lexbuf) }
+  | `/`                 { Parser.DIVIDE    (getPos lexbuf) }
+  | `=`                 { Parser.EQUAL     (getPos lexbuf) }
+  | `<`                 { Parser.LESS      (getPos lexbuf) }
+
+  | `(`                 { Parser.LPAR      (getPos lexbuf) }
+  | `)`                 { Parser.RPAR      (getPos lexbuf) }
+  | `[`                 { Parser.LBRA      (getPos lexbuf) }
+  | `]`                 { Parser.RBRA      (getPos lexbuf) }
+  | `{`                 { Parser.LCBR      (getPos lexbuf) }
+  | `}`                 { Parser.RCBR      (getPos lexbuf) }
+
+  | `,`                 { Parser.COMMA     (getPos lexbuf) }
+  | `;`                 { Parser.SEMICOLON (getPos lexbuf) }
+  | `:`                 { Parser.COLON     (getPos lexbuf) }
+
+  | eof                 { Parser.EOF       (getPos lexbuf) }
+...
+\end{fancycode}
+
+\section{Source code typed abstract syntax tree}
+Only edited code is shown, when code is omitted $\ldots$ is inserted instead.
+\begin{fancycode}[frame=lines,fontsize=\scriptsize,label=\textit{edited code - SRC/TpAbSyn.sml - }]
+...
+    | Times   of Exp * Exp         * Pos      (* e.g., x * 3 *)
+    | Div     of Exp * Exp         * Pos      (* e.g., x / 3 *)
+...
+    | Or      of Exp * Exp         * Pos      (* e.g., (x=5) or y *)
+    | Not     of Exp               * Pos      (* e.g., not (x>3) *)
+...
+    | pp_exp (Times (e1, e2, _))    = "( " ^ pp_exp e1 ^ " * " ^ pp_exp e2 ^ " )"
+    | pp_exp (Div   (e1, e2, _))    = "( " ^ pp_exp e1 ^ " * " ^ pp_exp e2 ^ " )"
+...
+    | pp_exp (Or    (e1, e2, _))    = "( " ^ pp_exp e1 ^ " | " ^ pp_exp e2 ^ " )"
+    | pp_exp (Not   (e1, _)    )    = "( not " ^ pp_exp e1 ^ " )"
+...
+    | typeOfExp ( Times  (a,b,_) ) = typeOfExp a
+    | typeOfExp ( Div    (a,b,_) ) = typeOfExp a
+...
+    | typeOfExp ( Or     (_,_,_) ) = BType Bool
+    | typeOfExp ( Not    (_,_)   ) = BType Bool
+
+...
+    | posOfExp  ( Times  (_,_,p) ) = p
+    | posOfExp  ( Div    (_,_,p) ) = p
+...
+    | posOfExp  ( Or     (_,_,p) ) = p
+    | posOfExp  ( Not    (_,p)   ) = p
+...
+\end{fancycode}
+
+\section{Source code interpreter}
+Only edited code is shown, when code is omitted $\ldots$ is inserted instead.
+\begin{fancycode}[frame=lines,fontsize=\scriptsize,label=\textit{edited code - SRC/TpInterpret.sml - }]
+...
+fun evalOr (BVal (Log b1), BVal (Log b2), pos) = BVal (Log (b1 orelse b2))
+  | evalOr (v1, v2, pos) =
+        raise Error( "Or: argument types do not match. Arg1: " ^
+                      pp_val v1 ^ ", arg2: " ^ pp_val v2, pos )
+
+fun evalNot (BVal (Log b1), pos) = BVal (Log (not b1))
+  | evalNot (v1, pos) =
+        raise Error( "Not: argument types do not match. Arg1: " ^
+                      pp_val v1, pos )
+...
+        | other    =>
+            let val new_vtab = bindTypeIds(fargs, aargs, fid, pdcl, pcall)
+                val res  = execBlock( body, new_vtab, ftab )
+            in  ( case (rtp, res) of
+                    (NONE  , _     ) => updateOuterVtable vtab new_vtab (aexps, fargs)
+                  | (SOME t, SOME r) => if   typesEqual(t, typeOfVal r) 
+                                        then SOME r
+                                        else raise Error("in call fun: result does " ^
+                                                         "not match the return type! In fun/proc:" ^ fid ^ 
+                                                         " rettype: "^pp_type t^" result: "^pp_val r, pcall )
+                  | otherwise        => raise Error("in call: fun/proc "^fid^" illegal result: ", pcall ) )
+            end
+      end
+...
+and updateOuterVtable vtabOuter vtabInner (out_exp, in_arg) =
+let
+   val strlist = map (fn Dec((s,_),(_,_)) => s) in_arg
+   val ind_count  =  (List.tabulate(length strlist, fn x => x))
+
+   val _ = map ( fn (idx) =>
+               let val exp = List.nth(out_exp, idx)
+                   val s   = List.nth(strlist, idx)
+               in
+                  ( case SymTab.lookup s vtabInner of
+                    NONE => raise Error("Error input not understood", (0,0))
+                  | SOME result =>
+                           (*raise Error(s^" := "^pp_exp e, (0,0))*)
+                           ( case exp of
+                              LValue ( Var( id, _), _ ) =>
+                              (
+                               case SymTab.lookup id vtabOuter of
+                                 SOME adr =>
+                                 adr := !result
+                               | NONE => raise Error("DOESNT WORK", (0,0))
+                              )
+                           | _ => raise Error("DOESNT WORK", (0,0))
+                           )
+                  )
+               end
+         ) ind_count
+in
+   NONE
+end
+...
+  | evalExp ( Times(e1, e2, pos), vtab, ftab ) =
+        let val res1   = evalExp(e1, vtab, ftab)
+            val res2   = evalExp(e2, vtab, ftab)
+        in  evalBinop(op *, res1, res2, pos)
+        end
+  | evalExp ( Div(e1, e2, pos), vtab, ftab ) =
+        let val res1   = evalExp(e1, vtab, ftab)
+            val res2   = evalExp(e2, vtab, ftab)
+        in  evalBinop(op div, res1, res2, pos)
+        end
+...
+  | evalExp ( Or(e1, e2, pos), vtab, ftab ) =
+        let val r1 = evalExp(e1, vtab, ftab)
+            val r2 = evalExp(e2, vtab, ftab)
+	     in  evalOr(r1, r2, pos)
+     	  end
+
+  | evalExp ( Not(e1, pos), vtab, ftab ) =
+        let val r1 = evalExp(e1, vtab, ftab)
+	     in  evalNot(r1, pos)
+     	  end
+...
+\end{fancycode}
 
 \end{document}
