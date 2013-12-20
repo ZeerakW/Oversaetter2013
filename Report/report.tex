@@ -253,32 +253,91 @@ The expression \texttt{NOT} is implemented in a similar manner, by using the \te
 Muliplication and division is a bit more simple, they basically just compile each of the operands with \texttt{compileExp}, and then append the \texttt{MIPS} instructions \texttt{MUL} and \texttt{DIV} accordingly.
 
 \subsubsection{Testing Multiplication, Division, and Boolean Operators}
-A number of tests was done, to check that the multiply and divide operators, as well as the boolean operators \texttt{OR \& NOT}, are behaving as expected. The tests is available in \texttt{DATA\\parserTest.pal}, which both test a lot of parser-related functionality, but also includes testing of the aforementioned operators.\\
+A number of tests was done, to check that the multiply and divide operators, as well as the boolean operators \texttt{OR \& NOT}, are behaving as expected. The tests is available in \texttt{DATA\textbackslash parserTest.pal}, which both test a lot of parser-related functionality, but also includes testing of the aforementioned operators.
 
 This results does not need much explanation, as the expected results are trivial. But running the tests, confirm that the operators behave as desired.
 
 % TODO I'm working here !! :) - Klaus
 \subsection{Type inference \& Type Checking}
-This section explaines how we chose to implement type inference and type checking, focusing on what was needed to implement these properties into the Paladim compiler.\\
-The implementation for type checking of the \texttt{read}-function, was done in \texttt{Type.sml}. The type checking is done by checking what type expression is passed to the function, and from that determining an expected type of \texttt{read}. If the expression contains a specific operator, it is possible to determine what type, the subexpression are expected to be, and let \texttt{read} inherit this property.\\
-For simplicity, the type checking implemented, only works if it is possible to determine at least the right-hand side of an expression, as implementing all possible cases was not required. This means, that the left-hand subexpression determines the expected type of the right-hand side subexpression. Furthermore, since it there is no unique way of determining the type of an expression like \texttt{read OP read}, there is no implementation to deal with this case, and the type checking will most likely fail.\\
-The function \texttt{new} is also implemented by extending the \texttt{typeCheckExp}-function in \texttt{Type.sml}. The function recursively checks all the arguments of the \texttt{new}-function, by generating a new list of the arguments, and checking that all of these are \texttt{INTs}. Then it checks what \texttt{new} should return, and creates a new array, where the allocation of the element size, is dependent on the return type.
 \subsubsection{Type Inference}
-%Er det nødvendig med de 2 subsections her?
-\subsubsection{Type checking}
+This section explains how we chose to implement type inference and type checking, focusing on what was needed to implement these properties into the Paladim compiler.
 
-%Det nedenunder ved jeg ikke lige hvor hører til
-Interpreter:
-It is important to add pretty printing functionality for all new expressions, since the TpInterpreter is using these functions to print the code being interpreted.
+The implementation for type checking of the \texttt{read}-function, was done in \texttt{Type.sml}. The type checking is done by checking what type expression is passed to the function, and from that determining an expected type of \texttt{read}. If the expression contains a specific operator, it is possible to determine what type, the subexpression are expected to be, and let \texttt{read} inherit this property.
+
+For simplicity, the type checking implemented, only works if it is possible to determine at least the right-hand side of an expression, as implementing all possible cases was not required. This means, that the left-hand subexpression determines the expected type of the right-hand side subexpression. Furthermore, since there is no unique way of determining the type of an expression like \texttt{read() = read()}, there is no implementation to deal with this case, and the type checking will most likely fail.
+
+The implementation demands that for example the \texttt{assign} operator must give an expected type to its subexpressions, in our case we first calculate the type of the left-hand side of the operator, then give it as expected type to the right-hand side. In the following pseudocode, the first one would succeed, but the latter would not because of aforementioned problems. The expected types has been implemented to all relevant operators including plus, minus, division etc.
+\begin{align}
+INT &= read()\\
+read() &= INT
+\end{align}
+
+\subsubsection{Type checking the new-function}
+The function \texttt{new} is also implemented by extending the \texttt{typeCheckExp}-function in \texttt{Type.sml}. The function generate a list of arguments which is type checked. This list is then used to calculate another list containing the types of all arguments. This new list is then recursively compared against the \texttt{INT} type. If all arguments is \texttt{INT} the variable called \texttt{tpok} would be true, otherwise false. Then the rank of the array is calculated and the return type is created. If the rank is bigger than zero, and the variable \texttt{tpok} is true, the function will return the \texttt{FunApp} datatype from \texttt{TpAbSyn.sml}. The arguments to this datatype is the list of arguments calculated in the beginning, since these arguments is also containing the type of the expressions, which is required in the typed abstract syntax tree.
+
 \subsubsection{Testing Type Inference \& Type Checking}
-The testing of type inference and type checking is done in \texttt{DATA\\parterTest.pal}, line 87-103 (Linjenumre?). The expected results are !!!BLA BLA BLA!!!. And as it can be seen, by running the tests, this is what they return.
+The testing of type inference and type checking is done in \texttt{DATA\textbackslash parterTest.pal}, line 83-93. The lines are currently commented out, since this specific test file is used to test other features of the compiler. First we test the provided case like in (\ref{eq:read}). All of our test went as expected.
+
+\begin{align}
+\label{eq:read}
+chr(read()) = read()
+\end{align}
+
 \subsection{Array Indexing}
+\subsubsection{Type checking of array indexing}
+To implement array indexing, we needed to extend the type checker to include this case. We followed the suggested implementation steps. At first we look up the array in the variable table and extracts the type. Next we check that the provided variable is an array, and in case we extract the rank of the array from the symbol table. We then in a similar matter to type checking of the new function, check if all arguments is \texttt{INT}, since indexing can only be succeeded with integers. The result of this typecheck is put into the variable \texttt{tpok}. Lastly the rank of the provided indexing is calculated, to compare with the rank from the symbol table.
+
+If the variable \texttt{tpok} is true, meaning all arguments is integers, and the rank provided is bigger than zero, we just need to check wether the rank provided is the same as the rank in the symbol table, is this not the case, then the array is indexed wrongly, hence we need to raise an error. Otherwise we can proceed creating and returning a new \texttt{LValue} datatype of an array (with types).
+
+\subsubsection{Array indexing in compiler}
+To implement the array indexing, we have made 2 helper functions. The function checkInds which generate MIPS code to check if the indexing is inside the boundaries. Another function computeFlatIndex is used to generate MIPS code which calculate the index as a flat array representation, by using the method described in the assignment. The two functions are described in more detail after this section.
+
+The first thing the compiler should do is to look up the array in the symbol table. This will return a register, which keeps the location to the beginning of the array. Then the output from the two helper functions is added. At last the type of the array is used to determine wether the flat index computed should be multiplied by four. This is the case if the array contains integers, since an integer uses four bytes in memory compared to characters and logic variables which all use only one byte. The multiplication is done by using the \texttt{MIPS} expression \texttt{SLL} (shift-left-logical), which is more efficient than using \texttt{MUL}.
+
+Furthermore the array header containing the dimension and strides need to be added to the flat index, this is done by taking the amount of indexes and multiply by eight (dimension and strides takes one word of space which is four bytes). Finally the current location in memory has to be added to get the direct location in memory where our index is located.
+
+The register to the final location is returned together with all the MIPS code to calculate the location.
+
+\subsubsection*{BONUS: Calculating flat index without strides}
+As stated in the assignment it is possible to calculate the flat index without use of the stored strides. This is because the strides are simply calculated from dimensions. As example the first stride is the all of the dimension except the first one multiplied together, this could easily be calculated in MIPS, instead of loading the stride from the memory, it should calculate the stride and put in a new register.
+%, meaning the dimension of the array should be multiplied with the dimension 
+%Bonus: The computation of the flat index into the array’s content can be accomplished in a manner of similar efficiency to the one described in Section 3.2.3, but which uses only the array’s dimension sizes (and not its strides). A bonus will be offered if you present how this may be accomplished and/or if you actually implement it (instead of the suggested solution).
+
 \subsubsection{Testing Array Indexing}
+The array indexing is tested in file \texttt{arrayInd.pal}, we decided to test arrays of both integers and characters. We test both assigning a value to the array, but also reading an value. In addition we tested the cases where the indexing was out of boundaries, and where the indexing is not integers at all (characters). All tests went as expected.
+
+We have furthermore tested our implementations of various kind with the provided test files.
+
 \subsection{Call-by-value-result semantics}
+The last thing to implement in our compiler is call-by-value-result policy for procedures. This means that all variables a procedure takes as arguments, should be updated once the procedure is ending. Every single time a function or procedure is called, a new symbol table is created, our approach to implement this policy is to match the actual and formal arguments, and use the value in the new symbol table to update the former symbol table. The policy needs to be implemented in both the interpreter and compiler, which is stated in the following two sections.
+
+\subsection{Call-by-value-result in interpreter}
+This policy is implemented in interpreter by editing the function \texttt{callFun}. The function extract the return type of the Paladim function and uses this to determine wether the Paladim function is a function or procedure. If it is a procedure, it wouldn't have any return type. If that is the case, it should simply execute our helper function called \texttt{updateOuterVtable}, with the former and new symbol tables, and the list of formal and actual arguments.
+
+Our helper function first extracts a list of strings from the list of actual arguments. This list is used the generate another list, which is the indexes of the argument list. The second list is used to iterate over all of the arguments and for each of the arguments, the actual argument is looked up in the new symbol table, this gives us the location to an address which contains the location of the value of the actual argument. The next step is to look up the formal argument in the former symbol table, and update this value with the result from the actual argument. In the end the function returns \texttt{NONE}, since a procedure should not return anything.
+
+\subsection{Call-by-value-result in compiler}
+To implement the policy in the compiler, we have to edit the \texttt{compileF} and \texttt{compileStmt} functions in the compiler. First of all in \texttt{compileStmt}, we need to edit the generated \texttt{MIPS} code such that the arguments which are put into register by the function \texttt{putArgs} is moved back again after the procedure terminates. To do this, we have created a similar function to \texttt{putArgs}, called \texttt{rePutArgs}, this new function basically just does the inverse of \texttt{putArgs}. We also had to change the tabulate list to start from minReg instead of zero. This is because the arguments used in the procedures start with the lowest register as minReg. Finally the new functions output should be put after the \texttt{MIPS JAL} instruction.
+
+Our helper function \texttt{rePutArgs} extracts the first expression and corresponding register from the arguments. Then it extract the name of the expression to look it up in the symbol table. The registers value is then moved to the address from the symbol table. The rest of the list is appended by recursively using the same function.
+
+The last place to edit for enabling the policy for procedures is the \texttt{compileF} function. This function is running the register allocator, which in our case has to be modified, since we do not use register two for a return value. Instead the register allocator needs to have all of the used registers in our procedure (the arguments). Furthermore we also needed to add the MIPS code to move the variables back to registers. This second task is achieved by simply using a reverse map of \texttt{argcode}, we have called it \texttt{argcode\_rev}. The first task is achieved by extracting all the registers with map from the movePairs function provided.
+
 \subsubsection{Testing Call-by-Value-Result semantics}
+Our call-by-value-result policy is tested by using the provided test files together with our own test file. The files used for testing are the following.
+\begin{itemize}
+\item{\texttt{DATA\textbackslash procReturnSimul.pal}}
+\item{\texttt{DATA\textbackslash procSwap.pal}}
+\item{\texttt{DATA\textbackslash proctest.pal}}
+\end{itemize}
+
+All test went as expected, without issues.
 
 \section{Conclusion}
-The milestone has been met, according to the assignment specification. The tests clearly indicate this.
+%The milestone has been met, according to the assignment specification. The tests clearly indicate this.
+The compilers demands has been met, according to the assignment specification. All of the test are being called without unexpected results.
+
+We have successfully implemented parser, type checker, code generator and interpreter of all asked features. All of the tests has been executed with the MARS simulator, to verify the solution is working as stated.
 
 %\section{Bibliography}
 \begin{thebibliography}{9}
@@ -289,10 +348,10 @@ Springer London,
 2011.
 
 %\bibitem{slide:interpretation}
+%Slide
 \end{thebibliography}
 
-
-%\section{Appendix A: }
+%\section*{A }
 %Write here \ldots
 
 \end{document}
