@@ -2,24 +2,13 @@
 \usepackage[margin=3cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{array}
 \usepackage{amsmath}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{graphicx}
-\usepackage{epstopdf}
-\usepackage{verbments}
-\usepackage{wrapfig}
-\usepackage{color}
 \usepackage{fancyvrb}
-
-\renewcommand{\contentsname}{\section{Table of Contents}}
-%\usepackage[colorlinks=true,linkcolor=black]{hyperref}
-% Fancy code with color commands:
+\usepackage[colorlinks=true,linkcolor=black]{hyperref}
 \DefineVerbatimEnvironment{fancycode}%
-        {Verbatim}{fontsize=\footnotesize,commandchars=\\\{\}}
+  {Verbatim}{fontsize=\footnotesize,commandchars=\\\{\}}
 \DefineVerbatimEnvironment{code}%
-        {Verbatim}{fontsize=\footnotesize}
+  {Verbatim}{fontsize=\footnotesize}
 
 \title{A Compiler for the \textbf{Paladim} Language}
 \author{
@@ -35,6 +24,7 @@
 \begin{document}
 \maketitle
 
+\renewcommand{\contentsname}{\section{Table of contents}}
 \tableofcontents
 \section{Introduction}
 In this report we will document the changes we have made to the Paladim language. 
