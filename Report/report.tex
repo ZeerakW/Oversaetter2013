@@ -227,7 +227,7 @@ The last step to create a new parser, is to link the compiler to use the new imp
 We have tested our parser implementation with a new test file we have created for the purpose, called \textit{"parserTest.pal"}. This file is testing pretty much all of the different productions used in the language. We got all of them to work like they should. To test the parser while the type checker was not implemented, we simply noted if the Paladim program would fail with \texttt{parser error} or \texttt{type checking error}, if the last was the case, it meant the parser did the job correctly since its a typechecker error, hence the compiler proceeded after parse checking.
 
 \subsection{Integer multiplication/division and boolean operators}
-The multiplication and division is both fully supported by the parser, next task is to implement the features in the type checker.
+The multiplication, division and boolean operators is all fully supported by the parser, next task is to implement the features in the type checker.
 
 To implement the features in the Paladim compiler, we initially edited the typed abstract syntax tree, \texttt{TpAbsyn.sml}, by adding \texttt{Times \& Div} types to the \texttt{typeOfExp} function. This function should simply just return the type of first operand, since the type check makes sure both operands are of same type. Another important thing to add in this file is the pretty printing of the expressions, since the Interpreter is using the pretty printing functionsto show the code to the user. It is done in a similar matter to the pretty printing of \texttt{Plus} and \texttt{Minus}.
 
@@ -241,22 +241,23 @@ Since multiplication, division and the boolean operators is now implemented in t
 The interpreter can expect to get type checked expression, therefore we can simply just evaluate each operand of the expression, and calculate the result, just like with \texttt{Plus} and \texttt{Minus}. This is very trivial for both, the only thing to note here, is in division we have to use the SML function called div, since we are interested in integer division and not floating point division.
 
 Finally we also need to implement the boolean operators in the interpreter. Since the boolean operator \texttt{AND} is already implemented, we decided to implement \texttt{OR} and \texttt{NOT} in the same style, by having a function to evaluate each of the expression respectively \texttt{evalOR} and \texttt{evalNOT}. These helper functions simply calculate \texttt{OR} and \texttt{NOT} by using the SML functions \texttt{orelse} and \texttt{not}. The interpreter is evaluating each of the operands to the function before calling the helper functions, which means the helper function is simply gonna get one or two arguments respectively.
-% TODO I'm working here !! :) - Klaus
 % TODO, maybe add some lines of code to show proof-of-concept
 
 \subsubsection{Multiplication, division and boolean operators in compiler}
-% TODO Fix
-Finally to implement the features in the compiler, we edited the \texttt{Compilers.sml} file. We recursively translate the expressions on each side of the operator and append the code for each translated expression to a list, to which we finally append the corresponding \texttt{MIPS} instruction.
+Finally to implement the features in the compiler, we edited the \texttt{Compilers.sml} file.
 
-%\subsubsection{Boolean operators}
-% TODO Fix
-%Finally, we in \texttt{Compiler.sml} we have implemented the translation to machine code for \texttt{or} inspired by the given implementation for \texttt{and}. \texttt{not} is implemented by using the \texttt{xori} instruction from the \texttt{MIPS} library, \texttt{xor-ing 1} on the register containing the value to be negated.
+To implement the boolean operators in the compiler, we used the same approach as with the \texttt{AND} operator. The function should return a list of Mips instructions to achieve this task, hence the beginning of the list should be the output of the function \texttt{compileExp} with the first operand as argument. The list is then followed with some code that check if the first operand is different from zero (meaning the expression is true), if this is the case, it would branch to a label in the end of the expression, since there is no need to check more. If the first operand is indeed zero, there should be no branching, and the second operand should be checked, hence the result is that of \texttt{compileExp} of second operand.
+
+The expression \texttt{NOT} is implemented in a similar manner, by using the \texttt{XORI} instruction from the \texttt{MIPS} library on the register containing the value to be negated (by using the function \texttt{compileExp}.
+
+Muliplication and division is a bit more simple, they basically just compile each of the operands with \texttt{compileExp}, and then append the \texttt{MIPS} instructions \texttt{MUL} and \texttt{DIV} accordingly.
 
 \subsubsection{Testing Multiplication, Division, and Boolean Operators}
-A number of tests was done, to check that the multiply and divide operators, as well as the boolean operators \texttt{or \& not}, are behaving as expected. The tests is available in \texttt{DATA\\parserTest.pal}, which both test a lot of parser-related functionality, which includes the testing of the aforementioned operators.\\
+A number of tests was done, to check that the multiply and divide operators, as well as the boolean operators \texttt{OR \& NOT}, are behaving as expected. The tests is available in \texttt{DATA\\parserTest.pal}, which both test a lot of parser-related functionality, but also includes testing of the aforementioned operators.\\
 
 This results does not need much explanation, as the expected results are trivial. But running the tests, confirm that the operators behave as desired.
 
+% TODO I'm working here !! :) - Klaus
 \subsection{Type inference \& Type Checking}
 This section explaines how we chose to implement type inference and type checking, focusing on what was needed to implement these properties into the Paladim compiler.\\
 The implementation for type checking of the \texttt{read}-function, was done in \texttt{Type.sml}. The type checking is done by checking what type expression is passed to the function, and from that determining an expected type of \texttt{read}. If the expression contains a specific operator, it is possible to determine what type, the subexpression are expected to be, and let \texttt{read} inherit this property.\\
