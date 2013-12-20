@@ -228,7 +228,7 @@ The last step to create a new parser, is to link the compiler to use the new imp
 \subsubsection{Testing Parser}
 We have tested our parser implementation with a new test file we have created for the purpose, called \textit{"parserTest.pal"}. This file is testing pretty much all of the different productions used in the language. We got all of them to work like they should. To test the parser while the type checker was not implemented, we simply noted if the Paladim program would fail with \texttt{parser error} or \texttt{type checking error}, if the last was the case, it meant the parser did the job correctly since its a typechecker error, hence the compiler proceeded after parse checking.
 
-\subsection{Integer multiplication/division}
+\subsection{Integer multiplication/division and boolean operators}
 The multiplication and division is both fully supported by the parser, next task is to implement the features in the type checker.\\
 
 To implement the features in the Paladim compiler, we initially edited the typed abstract syntax tree, \texttt{TpAbsyn.sml}, by adding \texttt{Times \& Div} types to the \texttt{typeOfExp} function. This function can simply just return the type of first operand, since the type check makes sure both operands are of same type. Another important thing to add in this file is the pretty printing of the expressions, since the Interpreter is using those functions. It is done in a similar matter to \texttt{Plus} and \texttt{Minus}.
@@ -236,7 +236,7 @@ To implement the features in the Paladim compiler, we initially edited the typed
 Then we edited the type checker, \texttt{Type.sml}, extending the function \texttt{typeCheckExp}. The two functions is implemented by doing a type check recursively of the expressions on both sides of the multiplication or the division operator. These results is compared with the type \texttt{INT}, to make sure both have correct type, if this is not the case we raise an error.\\
 
 \subsubsection{Multiplication and division in interpreter}
-
+% TODO Fix
 Then we edited \texttt{TpInterpret.sml} to implement the formula(\ref{slide:interpretation})
 \begin{align}
 Eval_{exp}(Exp, vtable, ftable) =& Exp_1 binop Exp_2\\
@@ -246,28 +246,32 @@ v2 =& Eval_{Exp} (Exp_2, vtable, ftable)\label{formula:v2}
 then running the function \texttt{evalBinop} on the operator and the results of the recursive calls to \texttt{evalExp} (gained from \ref{formula:v1} and \ref{formula:v2}).\\
 
 \subsubsection{Multiplication and division in compiler}
+% TODO Fix
 Finally we edited the \texttt{Compilers.sml} file, we recursively translate the expressions on each side of the operator and append the code for each translated expression to a list, to which we finally append the corresponding \texttt{MIPS} instruction.
 
-
 \subsubsection{Boolean operators}
+% TODO Fix
 The same has been done for the \texttt{or \& not} operators, correspondingly changing the typecheck from \texttt{INT} to \texttt{BOOL}. Furthermore, seeing as \texttt{not} is a unary operator we have ensured that the check is only done for one expression, rather than two, as with the rest of the operators we were to implement. Finally, we in \texttt{Compiler.sml} we have implemented the translation to machine code for \texttt{or} inspired by the given implementation for \texttt{and}. \texttt{not} is implemented by using the \texttt{xori} instruction from the \texttt{MIPS} library, \texttt{xor-ing 1} on the register containing the value to be negated.
 
 Boolean operators is now fully supported by the lexer and parser. The next task to implement this feature is to implement the type checking for these operations.
 
-The \texttt{or} operator is very 
-
-
 \subsubsection{Testing Multiplication, Division, and Boolean Operators}
+A number of tests was done, to check that the multiply and divide operators, as well as the boolean operators \testtt{or \& not}, are behaving as expected. The tests is available in \texttt{DATA\parserTest.pal}, which both test a lot of parser-related functionality, which includes the testing of the aforementioned operators.\\ This results does not need much explanation, as the expected results are trivial. But running the tests, confirm that the operators behave as desired.
 
 \subsection{Type inference \& Type Checking}
+This section explaines how we chose to implement type inference and type checking, focusing on what was needed to implement these properties into the Paladim compiler.\\
+The implementation for type checking of the \texttt{read}-function, was done in \texttt{Type.sml}. The type checking is done by checking what type expression is passed to the function, and from that determining an expected type of \texttt{read}. If the expression contains a specific operator, it is possible to determine what type, the subexpression are expected to be, and let \texttt{read} inherit this property.\\
+For simplicity, the type checking implemented, only works if it is possible to determine at least the right-hand side of an expression, as implementing all possible cases was not required. This means, that the left-hand subexpression determines the expected type of the right-hand side subexpression. Furthermore, since it there is no unique way of determining the type of an expression like \texttt{read OP read}, there is no implementation to deal with this case, and the type checking will most likely fail.\\
+The function \texttt{new} is also implemented by extending the \texttt{typeCheckExp}-function in \texttt{Type.sml}. The function recursively checks all the arguments of the \texttt{new}-function, by generating a new list of the arguments, and checking that all of these are \texttt{INTs}. Then it checks what \texttt{new} should return, and creates a new array, where the allocation of the element size, is dependent on the return type.
 \subsubsection{Type Inference}
+%Er det nødvendig med de 2 subsections her?
 \subsubsection{Type checking}
-* To check the type we needed to add support for checking the type of Or and Not in TpAbSyn
-* We also uncommented Or and Not in the TpAbSyn structure
 
+%Det nedenunder ved jeg ikke lige hvor hører til
 Interpreter:
 It is important to add pretty printing functionality for all new expressions, since the TpInterpreter is using these functions to print the code being interpreted.
 \subsubsection{Testing Type Inference \& Type Checking}
+The testing of type inference and type checking is done in \texttt{DATA\parterTest.pal}, line 87-103 (Linjenumre?). The expected results are !!!BLA BLA BLA!!!. And as it can be seen, by running the tests, this is what they return.
 \subsection{Array Indexing}
 \subsubsection{Testing Array Indexing}
 \subsection{Call-by-value-result semantics}
