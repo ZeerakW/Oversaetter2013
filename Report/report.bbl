@@ -1,0 +1,68 @@
+\begin{thebibliography}{10}
+
+\bibitem{springer2011}
+Torben Ægidius Mogensen.
+\newblock {\em Introduction to Compiler Design}.
+\newblock Springer, London, 2011.
+
+\bibitem{slideInterpretation}
+Cosmin Oancea.
+\newblock \emph{Interpretation}.
+\newblock Department of Computer Science, University of Copenhagen, 2013.
+
+\bibitem{slideSyntaxAnalysis}
+Jost Berthold.
+\newblock \emph{Syntax Analysis}.
+\newblock Department of Computer Science, University of Copenhagen, 2013.
+
+\bibitem{slideTypeChecking}
+Cosmin Oancea.
+\newblock \emph{Type Checking}.
+\newblock Department of Computer Science, University of Copenhagen, 2013.
+
+\bibitem{slideMachineCodeGeneration}
+Cosmin Oancea.
+\newblock \emph{Machine Code Generation}.
+\newblock Department of Computer Science, University of Copenhagen, 2013.
+
+\bibitem{slideMachineCodeGenerationFunction}
+Cosmin Oancea.
+\newblock \emph{Machine Code Generation for Function}.
+\newblock Department of Computer Science, University of Copenhagen, 2013.
+
+\bibitem{slideRegAlloc}
+Cosmin Oancea.
+\newblock \emph{Liveness Analysis And Register Allocation}.
+\newblock Department of Computer Science, University of Copenhagen, 2013.
+
+\bibitem{slideLexicalAnalysis}
+Jost Berthold.
+\newblock \emph{Lexical Analysis}.
+\newblock Department of Computer Science, University of Copenhagen, 2013.
+
+\bibitem{MoscowML}
+{Moscow ML} -- a light-weight implementation of {Standard ML (SML)}.
+\newblock \url{http://mosml.org}, 2013.
+\newblock New release 2.10 in 2013 with substantial improvements.
+
+\bibitem{Mars}
+{\textsc{Mars}, a MIPS Assembler and Runtime Simulator}, version 4.4.
+\newblock \url{http://courses.missouristate.edu/kenvollmar/mars/}, 2002-2013.
+\newblock Manual:
+  \url{http://courses.missouristate.edu/KenVollmar/MARS/Help/MarsHelpIntro.html}.
+
+\bibitem{MipsModule}
+Jost Berthold.
+\newblock {MIPS, Register Allocation and MARS simulator}.
+\newblock Based on an earlier version in Danish, by Torben Mogensen. Available
+  on Absalon., 2013.
+
+\bibitem{PattersonHennessy}
+David~A. Patterson and John~L. Hennessy.
+\newblock {\em Computer Organization \& Design, the Hardware/Software
+  Interface}.
+\newblock Morgan Kaufmann, 1998.
+\newblock Appendix A is freely available at
+  \url{http://www.cs.wisc.edu/~larus/HP_AppA.pdf}.
+
+\end{thebibliography}

@@ -1,0 +1,44 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[dot, autosize, outputdir="graphfiles/"]{dot2texi}
+\usepackage{tikz}
+\usepackage{amsmath, mathtools}
+\usetikzlibrary{shapes}
+\title{W3}
+\author{Zeerak Waseem - csp265}
+\date{8/12/2013}
+\begin{document}
+\maketitle
+\newpage
+
+\section{Exercise 1}
+\subsection{a}
+Translate \(gcd(x+y, y+1) * 2\) into intermediate code. Given information: result in \(t0\), \(vtable = [x\rightarrow v, y\rightarrow w], ftable = [gcd\rightarrow \_GCD\_ ]\).
+\begin{verbatim}
+$t1 := v # $t1 = x
+$t2 := w # $t2 = y
+  $t3 := $t2 + $t3 # $t3 x + y
+  $t4 := $t2 + 1
+ $t5 := CALL _GCD_ ($t3, $t4)
+$t0 := $t5 * 2 # or shift right $t5, 1
+\end{verbatim}
+\subsection{b}
+
+
+Mips Code:
+\begin{verbatim}
+Else-clase:
+  sub $t2, $t2, $t1
+
+Loop:
+  bgt $t1, $t2, Else-clause # Branch if $t1 > $t2
+  sub $t1, $t1, $t2 # Action on if condition
+  beq $t1, $zero, Exit # Branch if a = 0
+  div $t3, $t1, $t2 
+  beq $t3, $zero, Exit # Branch if a/b = 0
+  j Loop
+\end{verbatim}
+
+\noindent With some \texttt{Exit} label, terminating the program.
+
+\end{document}

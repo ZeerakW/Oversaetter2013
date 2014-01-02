@@ -1,0 +1,21 @@
+%token <string> aChar bChar cChar
+%token EOF
+
+%start S
+
+%type <string list> S T
+
+%%
+
+S : T EOF           { $1 }
+
+T : aChar T aChar {print "Rule aTa\n"; $2}
+  | aChar         { print "Rule a\n";[$1]}
+  | bChar T bChar {print "Rule bTb\n"; $2}
+  | bChar         { print "Rule b\n";[$1]}
+  | cChar T cChar {print "Rule cTc\n";$2}
+  | cChar         { print "Rule c\n";[$1]}
+  |               {print "Epsilon\n";[]}
+;
+
+

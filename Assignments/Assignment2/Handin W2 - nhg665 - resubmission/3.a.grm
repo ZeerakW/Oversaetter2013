@@ -1,0 +1,11 @@
+%token <string> aChar
+
+%start S
+
+%type <string list> S
+
+%%
+
+S : S aChar   {print "\nRule Sa"; $1 @ [$2]}
+  |           {print "\nEpsilon";[]}
+;

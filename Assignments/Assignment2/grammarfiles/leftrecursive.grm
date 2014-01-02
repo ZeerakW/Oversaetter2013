@@ -1,0 +1,8 @@
+%token <string> aChar
+%start S
+%type <string list> S
+
+%%
+S : S aChar	{ $1 @ [$2] }
+  |		{ };
+%%
